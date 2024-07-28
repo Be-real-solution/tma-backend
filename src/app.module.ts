@@ -4,7 +4,7 @@ import { PrismaModule } from './prisma'
 import { databaseConfig } from './configs'
 import { ServeStaticModule } from '@nestjs/serve-static'
 import { join } from 'path'
-import { AuthModule, AuthorModule, NewModule } from './modules'
+import { AuthModule, AuthorModule, BuildingModule, NewModule } from './modules'
 import { JwtModule } from '@nestjs/jwt'
 
 @Module({
@@ -18,6 +18,7 @@ import { JwtModule } from '@nestjs/jwt'
 		PrismaModule,
 		AuthModule,
 		AuthorModule,
+		BuildingModule,
 		NewModule,
 	],
 })

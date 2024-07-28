@@ -84,8 +84,9 @@ export class AuthorRepo {
 	}
 
 	async delete(payload: AuthorDeleteRequest): Promise<MutationResponse> {
-		await this.prisma.author.delete({
+		await this.prisma.author.update({
 			where: { deletedAt: null, id: payload.id },
+			data: { deletedAt: new Date() },
 		})
 
 		return payload

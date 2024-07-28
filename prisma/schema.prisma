@@ -64,6 +64,7 @@ model Building {
   phoneNumber    String     @map("phoneNumber")      @db.VarChar()
   workEndTime    String     @map("work_end_time")    @db.VarChar()
   workStartTime  String     @map("work_start_time")  @db.VarChar()
+  imageLink      String     @map("image_link")       @db.VarChar()
   createdAt      DateTime   @map("created_at")       @db.Timestamp     @default(now())
   updatedAt      DateTime   @map("updated_at")       @db.Timestamp     @updatedAt
   deletedAt      DateTime?  @map("deleted_at")       @db.Timestamp
