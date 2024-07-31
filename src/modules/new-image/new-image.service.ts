@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { NewImageRepo } from './new-image.repo'
-import { NewImageCreateRequest, NewImageDeleteRequest, NewImageGetAllRequest, NewImageGetOneResponse } from './interfaces'
+import { NewImageCreateManyRequest, NewImageCreateRequest, NewImageDeleteManyRequest, NewImageDeleteRequest, NewImageGetAllRequest, NewImageGetOneResponse } from './interfaces'
 import { MutationResponse } from '../../interfaces'
 
 @Injectable()
@@ -18,7 +18,15 @@ export class NewImageService {
 		return this.repo.create(payload)
 	}
 
+	async createMany(payload: NewImageCreateManyRequest): Promise<MutationResponse> {
+		return this.repo.createMany(payload)
+	}
+
 	async delete(payload: NewImageDeleteRequest): Promise<MutationResponse> {
 		return this.repo.delete(payload)
+	}
+
+	async deleteMany(payload: NewImageDeleteManyRequest): Promise<MutationResponse> {
+		return this.repo.deleteMany(payload)
 	}
 }

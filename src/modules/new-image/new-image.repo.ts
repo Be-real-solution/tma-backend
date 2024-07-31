@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { PrismaService } from '../../prisma'
-import { NewImageCreateRequest, NewImageDeleteRequest, NewImageGetAllRequest, NewImageGetOneResponse } from './interfaces'
+import { NewImageCreateManyRequest, NewImageCreateRequest, NewImageDeleteManyRequest, NewImageDeleteRequest, NewImageGetAllRequest, NewImageGetOneResponse } from './interfaces'
 import { MutationResponse } from '../../interfaces'
 
 @Injectable()
@@ -27,6 +27,13 @@ export class NewImageRepo {
 		return newImage
 	}
 
+	async createMany(payload: NewImageCreateManyRequest): Promise<null> {
+		await this.prisma.newImage.createMany({
+			data: payload.datas.map((p) => ({ newId: p.newId, imageLink: p.imageLink })),
+		})
+		return null
+	}
+
 	async delete(payload: NewImageDeleteRequest): Promise<MutationResponse> {
 		await this.prisma.newImage.update({
 			where: { deletedAt: null, id: payload.id },
@@ -34,5 +41,14 @@ export class NewImageRepo {
 		})
 
 		return payload
+	}
+
+	async deleteMany(payload: NewImageDeleteManyRequest): Promise<null> {
+		await this.prisma.newImage.updateMany({
+			where: { deletedAt: null, id: { in: payload.ids } },
+			data: { deletedAt: new Date() },
+		})
+
+		return null
 	}
 }

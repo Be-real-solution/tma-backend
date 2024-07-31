@@ -30,6 +30,7 @@ export class NewUpdateRequestDto implements NewUpdateRequest {
 	authorId?: string
 	viewsCount?: number
 	description?: string
+	imagesToDelete?: string[]
 }
 
 export class NewDeleteRequestDto implements NewDeleteRequest {

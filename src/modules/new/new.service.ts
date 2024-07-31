@@ -2,12 +2,15 @@ import { BadRequestException, Injectable } from '@nestjs/common'
 import { NewRepo } from './new.repo'
 import { NewCreateRequest, NewDeleteRequest, NewGetAllRequest, NewGetAllResponse, NewGetOneByIdRequest, NewGetOneRequest, NewGetOneResponse, NewUpdateRequest } from './interfaces'
 import { MutationResponse } from '../../interfaces'
+import { NewImageService } from '../new-image'
 
 @Injectable()
 export class NewService {
 	private readonly repo: NewRepo
-	constructor(repo: NewRepo) {
+	private readonly newImageService: NewImageService
+	constructor(repo: NewRepo, newImageService: NewImageService) {
 		this.repo = repo
+		this.newImageService = newImageService
 	}
 
 	async getAll(payload: NewGetAllRequest): Promise<NewGetAllResponse | NewGetOneResponse[]> {
@@ -33,7 +36,9 @@ export class NewService {
 		if (candidate) {
 			throw new BadRequestException(`this name already exists`)
 		}
-		return this.repo.create(payload)
+		const neww = await this.repo.create(payload)
+		await this.newImageService.createMany({ datas: payload.imageLinks.map((i) => ({ newId: neww.id, imageLink: i.filename })) })
+		return neww
 	}
 
 	async update(param: NewGetOneByIdRequest, payload: NewUpdateRequest): Promise<MutationResponse> {
@@ -43,7 +48,12 @@ export class NewService {
 				throw new BadRequestException(`this name already exists`)
 			}
 		}
-		return this.repo.update({ ...param, ...payload })
+
+		const updatedNew = await this.repo.update({ ...param, ...payload })
+		await this.newImageService.deleteMany({ ids: payload.imagesToDelete })
+		await this.newImageService.createMany({ datas: payload.imageLinks.map((i) => ({ newId: updatedNew.id, imageLink: i.filename })) })
+
+		return updatedNew
 	}
 
 	async delete(payload: NewDeleteRequest): Promise<MutationResponse> {

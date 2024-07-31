@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common'
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common'
 import { BuildingService } from './building.service'
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger'
 import {
@@ -13,6 +13,7 @@ import {
 import { BuildingGetAllResponse, BuildingGetOneResponse } from './interfaces'
 import { AuthGuard, MutationResponseDto, PAGE_NUMBER, PAGE_SIZE, PAGINATION } from '../../common'
 import { MutationResponse } from '../../interfaces'
+import { FileInterceptor } from '@nestjs/platform-express'
 
 @ApiTags('building')
 @UseGuards(AuthGuard)
@@ -43,15 +44,17 @@ export class BuildingController {
 	}
 
 	@Post()
+	@UseInterceptors(FileInterceptor('image'))
 	@ApiResponse({ type: MutationResponseDto })
-	create(@Body() payload: BuildingCreateRequestDto): Promise<MutationResponse> {
-		return this.service.create(payload)
+	create(@Body() payload: BuildingCreateRequestDto, @UploadedFile() image: Express.Multer.File): Promise<MutationResponse> {
+		return this.service.create({ ...payload, imageLink: image.filename })
 	}
 
 	@Patch(':id')
+	@UseInterceptors(FileInterceptor('image'))
 	@ApiResponse({ type: MutationResponseDto })
-	update(@Param() param: BuildingGetOneByIdRequestDto, @Body() payload: BuildingUpdateRequestDto): Promise<MutationResponse> {
-		return this.service.update(param, payload)
+	update(@Param() param: BuildingGetOneByIdRequestDto, @Body() payload: BuildingUpdateRequestDto, @UploadedFile() image: Express.Multer.File): Promise<MutationResponse> {
+		return this.service.update(param, { ...payload, imageLink: image.filename ?? undefined })
 	}
 
 	@Delete(':id')

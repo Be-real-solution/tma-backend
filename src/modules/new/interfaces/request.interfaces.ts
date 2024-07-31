@@ -22,6 +22,8 @@ export declare interface NewCreateRequest {
 	name: string
 	description: string
 	authorId: string
+	//=
+	imageLinks?: Array<Express.Multer.File>
 }
 
 export declare interface NewUpdateRequest {
@@ -29,6 +31,9 @@ export declare interface NewUpdateRequest {
 	description?: string
 	authorId?: string
 	viewsCount?: number
+	//=
+	imageLinks?: Array<Express.Multer.File>
+	imagesToDelete?: string[]
 }
 
 export declare interface NewDeleteRequest {

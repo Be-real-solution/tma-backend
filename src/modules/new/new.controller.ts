@@ -1,10 +1,11 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common'
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common'
 import { NewService } from './new.service'
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { NewCreateRequestDto, NewDeleteRequestDto, NewGetAllRequestDto, NewGetAllResponseDto, NewGetOneByIdRequestDto, NewGetOneResponseDto, NewUpdateRequestDto } from './dtos'
 import { NewGetAllResponse, NewGetOneResponse } from './interfaces'
 import { AuthGuard, MutationResponseDto, PAGE_NUMBER, PAGE_SIZE, PAGINATION } from '../../common'
 import { MutationResponse } from '../../interfaces'
+import { FilesInterceptor } from '@nestjs/platform-express'
 
 @ApiTags('new')
 @UseGuards(AuthGuard)
@@ -35,15 +36,17 @@ export class NewController {
 	}
 
 	@Post()
+	@UseInterceptors(FilesInterceptor('images'))
 	@ApiResponse({ type: MutationResponseDto })
-	create(@Body() payload: NewCreateRequestDto): Promise<MutationResponse> {
-		return this.service.create(payload)
+	create(@Body() payload: NewCreateRequestDto, @UploadedFiles() images: Array<Express.Multer.File>): Promise<MutationResponse> {
+		return this.service.create({ ...payload, imageLinks: images })
 	}
 
 	@Patch(':id')
+	@UseInterceptors(FilesInterceptor('images'))
 	@ApiResponse({ type: MutationResponseDto })
-	update(@Param() param: NewGetOneByIdRequestDto, @Body() payload: NewUpdateRequestDto): Promise<MutationResponse> {
-		return this.service.update(param, payload)
+	update(@Param() param: NewGetOneByIdRequestDto, @Body() payload: NewUpdateRequestDto, @UploadedFiles() images: Array<Express.Multer.File>): Promise<MutationResponse> {
+		return this.service.update(param, { ...payload, imageLinks: images })
 	}
 
 	@Delete(':id')
