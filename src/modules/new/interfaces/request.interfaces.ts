@@ -1,4 +1,4 @@
-import { PaginationRequest } from '../../../interfaces'
+import { CreateInManyLangs, PaginationRequest } from '../../../interfaces'
 
 export declare interface NewGetAllRequest extends PaginationRequest {
 	name?: string
@@ -19,8 +19,8 @@ export declare interface NewGetOneRequest {
 }
 
 export declare interface NewCreateRequest {
-	name: string
-	description: string
+	name: CreateInManyLangs
+	description: CreateInManyLangs
 	authorId: string
 	//=
 	imageLinks?: Array<Express.Multer.File>

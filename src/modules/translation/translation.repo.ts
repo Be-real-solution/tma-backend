@@ -1,6 +1,14 @@
 import { Injectable } from '@nestjs/common'
 import { PrismaService } from '../../prisma'
-import { TranslationCreateRequest, TranslationDeleteRequest, TranslationGetOneByIdRequest, TranslationUpdateRequest } from './interfaces'
+import {
+	TranslationCreateManyRequest,
+	TranslationCreateRequest,
+	TranslationDeleteRequest,
+	TranslationGetAllRequest,
+	TranslationGetOneByIdRequest,
+	TranslationGetOneResponse,
+	TranslationUpdateRequest,
+} from './interfaces'
 import { MutationResponse } from '../../interfaces'
 
 @Injectable()
@@ -8,6 +16,20 @@ export class TranslationRepo {
 	private readonly prisma: PrismaService
 	constructor(prisma: PrismaService) {
 		this.prisma = prisma
+	}
+
+	async getAll(payload: TranslationGetAllRequest): Promise<TranslationGetOneResponse[]> {
+		const translations = await this.prisma.translation.findMany({
+			where: {
+				language: payload.language,
+				tableField: { in: payload.tableFields },
+				tableId: { in: payload.tableIds },
+				text: { contains: payload.text, mode: 'insensitive' },
+			},
+			select: { id: true, language: true, tableId: true, text: true, tableField: true },
+		})
+
+		return translations
 	}
 
 	async create(payload: TranslationCreateRequest): Promise<MutationResponse> {
@@ -21,6 +43,19 @@ export class TranslationRepo {
 		})
 
 		return translation
+	}
+
+	async createMany(payload: TranslationCreateManyRequest): Promise<null> {
+		await this.prisma.translation.createMany({
+			data: payload.datas.map((t) => ({
+				language: t.language,
+				tableField: t.tableField,
+				text: t.text,
+				tableId: t.tableId,
+			})),
+		})
+
+		return null
 	}
 
 	async update(payload: TranslationUpdateRequest & TranslationGetOneByIdRequest): Promise<MutationResponse> {

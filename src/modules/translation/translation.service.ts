@@ -1,6 +1,14 @@
 import { Injectable } from '@nestjs/common'
 import { TranslationRepo } from './translation.repo'
-import { TranslationCreateRequest, TranslationDeleteRequest, TranslationGetOneByIdRequest, TranslationUpdateRequest } from './interfaces'
+import {
+	TranslationCreateManyRequest,
+	TranslationCreateRequest,
+	TranslationDeleteRequest,
+	TranslationGetAllRequest,
+	TranslationGetOneByIdRequest,
+	TranslationGetOneResponse,
+	TranslationUpdateRequest,
+} from './interfaces'
 import { MutationResponse } from '../../interfaces'
 
 @Injectable()
@@ -10,8 +18,16 @@ export class TranslationService {
 		this.repo = repo
 	}
 
+	async getAll(payload: TranslationGetAllRequest): Promise<TranslationGetOneResponse[]> {
+		return this.repo.getAll(payload)
+	}
+
 	async create(payload: TranslationCreateRequest): Promise<MutationResponse> {
 		return this.repo.create(payload)
+	}
+
+	async createMany(payload: TranslationCreateManyRequest): Promise<null> {
+		return this.repo.createMany(payload)
 	}
 
 	async update(param: TranslationGetOneByIdRequest, payload: TranslationUpdateRequest): Promise<MutationResponse> {

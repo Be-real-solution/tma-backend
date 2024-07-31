@@ -1,4 +1,4 @@
-import { PaginationRequest } from '../../../interfaces'
+import { CreateInManyLangs, PaginationRequest } from '../../../interfaces'
 
 export declare interface BuildingGetAllRequest extends PaginationRequest {
 	name?: string
@@ -22,8 +22,8 @@ export declare interface BuildingGetOneRequest {
 }
 
 export declare interface BuildingCreateRequest {
-	name: string
-	address: string
+	name: CreateInManyLangs
+	address: CreateInManyLangs
 	phoneNumber: string
 	workEndTime: string
 	workStartTime: string

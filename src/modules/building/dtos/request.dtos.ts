@@ -1,4 +1,5 @@
 import { PaginationRequestDto } from '../../../common'
+import { CreateInManyLangs } from '../../../interfaces'
 import { BuildingCreateRequest, BuildingDeleteRequest, BuildingGetAllRequest, BuildingGetOneByIdRequest, BuildingUpdateRequest } from '../interfaces'
 
 export class BuildingGetAllRequestDto extends PaginationRequestDto implements BuildingGetAllRequest {
@@ -14,8 +15,8 @@ export class BuildingGetOneByIdRequestDto implements BuildingGetOneByIdRequest {
 }
 
 export class BuildingCreateRequestDto implements BuildingCreateRequest {
-	name: string
-	address: string
+	name: CreateInManyLangs
+	address: CreateInManyLangs
 	imageLink: string
 	phoneNumber: string
 	workEndTime: string

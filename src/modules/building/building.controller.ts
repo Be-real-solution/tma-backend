@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common'
+import { Body, Controller, Delete, Get, Headers, Param, Patch, Post, Query, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common'
 import { BuildingService } from './building.service'
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger'
 import {
@@ -14,6 +14,7 @@ import { BuildingGetAllResponse, BuildingGetOneResponse } from './interfaces'
 import { AuthGuard, MutationResponseDto, PAGE_NUMBER, PAGE_SIZE, PAGINATION } from '../../common'
 import { MutationResponse } from '../../interfaces'
 import { FileInterceptor } from '@nestjs/platform-express'
+import { LanguageEnum } from '@prisma/client'
 
 @ApiTags('building')
 @UseGuards(AuthGuard)
@@ -28,19 +29,22 @@ export class BuildingController {
 	@Get()
 	@ApiResponse({ type: BuildingGetAllResponseDto })
 	@ApiResponse({ type: BuildingGetOneResponseDto, isArray: true })
-	getAll(@Query() payload: BuildingGetAllRequestDto): Promise<BuildingGetAllResponse | BuildingGetOneResponse[]> {
-		return this.service.getAll({
-			...payload,
-			pageNumber: payload.pageNumber ?? PAGE_NUMBER,
-			pageSize: payload.pageSize ?? PAGE_SIZE,
-			pagination: payload.pagination === true ? PAGINATION : false,
-		})
+	getAll(@Query() payload: BuildingGetAllRequestDto, @Headers('accept-language') lang: LanguageEnum): Promise<BuildingGetAllResponse | BuildingGetOneResponse[]> {
+		return this.service.getAll(
+			{
+				...payload,
+				pageNumber: payload.pageNumber ?? PAGE_NUMBER,
+				pageSize: payload.pageSize ?? PAGE_SIZE,
+				pagination: payload.pagination === true ? PAGINATION : false,
+			},
+			lang,
+		)
 	}
 
 	@Get(':id')
 	@ApiResponse({ type: BuildingGetOneResponseDto })
-	getOneById(@Param() payload: BuildingGetOneByIdRequestDto): Promise<BuildingGetOneResponse> {
-		return this.service.getOneById(payload)
+	getOneById(@Param() payload: BuildingGetOneByIdRequestDto, @Headers('accept-language') lang: LanguageEnum): Promise<BuildingGetOneResponse> {
+		return this.service.getOneById(payload, lang)
 	}
 
 	@Post()

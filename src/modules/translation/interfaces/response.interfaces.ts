@@ -1,1 +1,9 @@
-export const NULL: undefined = null
+import { LanguageEnum } from '@prisma/client'
+
+export declare interface TranslationGetOneResponse {
+	id: string
+	text: string
+	tableId: string
+	tableField: string
+	language: LanguageEnum
+}

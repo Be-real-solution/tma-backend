@@ -1,6 +1,12 @@
 import { LanguageEnum } from '@prisma/client'
 import { TranslatedTableFields } from '../../../common'
 
+export declare interface TranslationGetAllRequest {
+	language?: LanguageEnum
+	tableIds?: string[]
+	tableFields?: string[]
+	text?: string
+}
 export declare interface TranslationGetOneByIdRequest {
 	id: string
 }
@@ -10,6 +16,10 @@ export declare interface TranslationCreateRequest {
 	language: LanguageEnum
 	tableField: TranslatedTableFields
 	tableId: string
+}
+
+export declare interface TranslationCreateManyRequest {
+	datas: TranslationCreateRequest[]
 }
 
 export declare interface TranslationUpdateRequest {

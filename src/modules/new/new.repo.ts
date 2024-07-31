@@ -77,8 +77,8 @@ export class NewRepo {
 	async create(payload: NewCreateRequest): Promise<MutationResponse> {
 		const neww = await this.prisma.new.create({
 			data: {
-				name: payload.name,
-				description: payload.description,
+				name: payload.name['en'] || Object.keys(payload.name)[0] || '',
+				description: payload.description['en'] || Object.keys(payload.description)[0] || '',
 				authorId: payload.authorId,
 			},
 		})
