@@ -91,14 +91,14 @@ export class NewService {
 		}
 		const neww = await this.repo.create(payload)
 		await this.newImageService.createMany({ datas: payload.imageLinks.map((i) => ({ newId: neww.id, imageLink: i.filename })) })
-		await this.createInManyLang(neww.id, payload)
+		await this.createInManyLang(neww.id, payload, 'create')
 
 		return neww
 	}
 
 	async update(param: NewGetOneByIdRequest, payload: NewUpdateRequest): Promise<MutationResponse> {
 		if (payload.name) {
-			const candidate = await this.getOne({ name: payload.name })
+			const candidate = await this.getOne({ name: payload.name['en'] })
 			if (candidate && candidate.id !== param.id) {
 				throw new BadRequestException(`this name already exists`)
 			}
@@ -107,6 +107,7 @@ export class NewService {
 		const updatedNew = await this.repo.update({ ...param, ...payload })
 		await this.newImageService.deleteMany({ ids: payload.imagesToDelete })
 		await this.newImageService.createMany({ datas: payload.imageLinks.map((i) => ({ newId: updatedNew.id, imageLink: i.filename })) })
+		await this.createInManyLang(updatedNew.id, payload, 'update')
 
 		return updatedNew
 	}
@@ -115,22 +116,62 @@ export class NewService {
 		return this.repo.delete(payload)
 	}
 
-	private async createInManyLang(id: string, payload: NewCreateRequest): Promise<void> {
-		await this.translationService.createMany({
-			datas: Object.keys(payload.name).map((k: LanguageEnum) => ({
-				language: k,
-				tableField: TranslatedTableFields.newName,
-				tableId: id,
-				text: payload.name[k],
-			})),
-		})
-		await this.translationService.createMany({
-			datas: Object.keys(payload.description).map((k: LanguageEnum) => ({
-				language: k,
-				tableField: TranslatedTableFields.newDescription,
-				tableId: id,
-				text: payload.description[k],
-			})),
-		})
+	private async createInManyLang(id: string, payload: NewUpdateRequest, functionality: string): Promise<void> {
+		if (functionality === 'create') {
+			await this.translationService.createMany({
+				datas: [
+					...Object.keys(payload.name).map((k: LanguageEnum) => ({
+						language: k,
+						tableField: TranslatedTableFields.newName,
+						tableId: id,
+						text: payload.name[k],
+					})),
+					...Object.keys(payload.description).map((k: LanguageEnum) => ({
+						language: k,
+						tableField: TranslatedTableFields.newDescription,
+						tableId: id,
+						text: payload.description[k],
+					})),
+				],
+			})
+		} else {
+			for (const k of Object.keys(payload.name)) {
+				const exists = await this.translationService.getAll({
+					language: k as LanguageEnum,
+					tableFields: [TranslatedTableFields.newName],
+					tableIds: [id],
+				})
+
+				if (exists.length) {
+					await this.translationService.update({ id: exists[0].id }, { text: payload.name[k as LanguageEnum] })
+				} else {
+					await this.translationService.create({
+						language: k as LanguageEnum,
+						tableField: TranslatedTableFields.newName,
+						tableId: id,
+						text: payload.name[k as LanguageEnum],
+					})
+				}
+			}
+
+			for (const k of Object.keys(payload.description)) {
+				const exists = await this.translationService.getAll({
+					language: k as LanguageEnum,
+					tableFields: [TranslatedTableFields.newDescription],
+					tableIds: [id],
+				})
+
+				if (exists.length) {
+					await this.translationService.update({ id: exists[0].id }, { text: payload.description[k as LanguageEnum] })
+				} else {
+					await this.translationService.create({
+						language: k as LanguageEnum,
+						tableField: TranslatedTableFields.newDescription,
+						tableId: id,
+						text: payload.description[k as LanguageEnum],
+					})
+				}
+			}
+		}
 	}
 }

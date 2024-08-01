@@ -8,12 +8,6 @@ export declare interface DatabaseConfigOptions {
 }
 
 export declare interface JwtConfigOptions {
-	accessToken: {
-		key: string
-		time: string
-	}
-	refreshToken: {
-		key: string
-		time: string
-	}
+	accessToken: { key: string; time: string }
+	refreshToken: { key: string; time: string }
 }

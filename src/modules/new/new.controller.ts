@@ -28,7 +28,7 @@ export class NewController {
 				...payload,
 				pageNumber: payload.pageNumber ?? PAGE_NUMBER,
 				pageSize: payload.pageSize ?? PAGE_SIZE,
-				pagination: payload.pagination === true ? PAGINATION : false,
+				pagination: [true, 'true'].includes(payload.pagination) ? PAGINATION : false,
 			},
 			lang,
 		)

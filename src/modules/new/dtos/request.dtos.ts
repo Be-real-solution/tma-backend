@@ -1,5 +1,5 @@
 import { PaginationRequestDto } from '../../../common'
-import { CreateInManyLangs } from '../../../interfaces'
+import { CreateInManyLangs, UpdateInManyLangs } from '../../../interfaces'
 import { NewCreateRequest, NewDeleteRequest, NewGetAllRequest, NewGetOneByIdRequest, NewGetOneRequest, NewUpdateRequest } from '../interfaces'
 
 export class NewGetAllRequestDto extends PaginationRequestDto implements NewGetAllRequest {
@@ -27,10 +27,10 @@ export class NewCreateRequestDto implements NewCreateRequest {
 }
 
 export class NewUpdateRequestDto implements NewUpdateRequest {
-	name?: string
+	name?: UpdateInManyLangs
+	description?: UpdateInManyLangs
 	authorId?: string
 	viewsCount?: number
-	description?: string
 	imagesToDelete?: string[]
 }
 

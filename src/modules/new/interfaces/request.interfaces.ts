@@ -1,4 +1,4 @@
-import { CreateInManyLangs, PaginationRequest } from '../../../interfaces'
+import { CreateInManyLangs, PaginationRequest, UpdateInManyLangs } from '../../../interfaces'
 
 export declare interface NewGetAllRequest extends PaginationRequest {
 	name?: string
@@ -27,8 +27,8 @@ export declare interface NewCreateRequest {
 }
 
 export declare interface NewUpdateRequest {
-	name?: string
-	description?: string
+	name?: UpdateInManyLangs
+	description?: UpdateInManyLangs
 	authorId?: string
 	viewsCount?: number
 	//=

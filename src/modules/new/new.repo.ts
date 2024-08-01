@@ -89,8 +89,8 @@ export class NewRepo {
 		const neww = await this.prisma.new.update({
 			where: { deletedAt: null, id: payload.id },
 			data: {
-				name: payload.name,
-				description: payload.description,
+				name: payload.name['en'] ?? undefined,
+				description: payload.description['en'] ?? undefined,
 				authorId: payload.authorId,
 				viewsCount: payload.viewsCount,
 			},

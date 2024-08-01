@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger'
 
 export class UnprocessableEntityExceptionDto {
-	@ApiProperty({ example: 'message' })
+	@ApiProperty({ example: 'message', type: String })
 	message: string
 
 	@ApiProperty({ example: {} })

@@ -116,9 +116,9 @@ export class BuildingRepo {
 		const building = await this.prisma.building.update({
 			where: { deletedAt: null, id: payload.id },
 			data: {
-				name: payload.name,
+				name: payload.name['en'] ?? undefined,
+				address: payload.address['en'] ?? undefined,
 				imageLink: payload.imageLink,
-				address: payload.address,
 				phoneNumber: payload.phoneNumber,
 				workEndTime: payload.workEndTime,
 				workStartTime: payload.workStartTime,

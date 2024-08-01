@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, Headers, Param, Patch, Post, Query, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common'
 import { BuildingService } from './building.service'
-import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { ApiBearerAuth, ApiConsumes, ApiResponse, ApiTags } from '@nestjs/swagger'
 import {
 	BuildingCreateRequestDto,
 	BuildingDeleteRequestDto,
@@ -35,7 +35,7 @@ export class BuildingController {
 				...payload,
 				pageNumber: payload.pageNumber ?? PAGE_NUMBER,
 				pageSize: payload.pageSize ?? PAGE_SIZE,
-				pagination: payload.pagination === true ? PAGINATION : false,
+				pagination: [true, 'true'].includes(payload.pagination) ? PAGINATION : false,
 			},
 			lang,
 		)
@@ -48,6 +48,7 @@ export class BuildingController {
 	}
 
 	@Post()
+	@ApiConsumes('multipart/form-data')
 	@UseInterceptors(FileInterceptor('image'))
 	@ApiResponse({ type: MutationResponseDto })
 	create(@Body() payload: BuildingCreateRequestDto, @UploadedFile() image: Express.Multer.File): Promise<MutationResponse> {
@@ -55,6 +56,7 @@ export class BuildingController {
 	}
 
 	@Patch(':id')
+	@ApiConsumes('multipart/form-data')
 	@UseInterceptors(FileInterceptor('image'))
 	@ApiResponse({ type: MutationResponseDto })
 	update(@Param() param: BuildingGetOneByIdRequestDto, @Body() payload: BuildingUpdateRequestDto, @UploadedFile() image: Express.Multer.File): Promise<MutationResponse> {
