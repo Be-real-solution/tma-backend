@@ -19,7 +19,7 @@ export class BuildingRepo {
 		this.prisma = prisma
 	}
 
-	async getAll(payload: BuildingGetAllRequest): Promise<BuildingGetAllResponse | BuildingGetOneResponse[]> {
+	async getAll(payload: BuildingGetAllRequest & { ids?: string[] }): Promise<BuildingGetAllResponse | BuildingGetOneResponse[]> {
 		let paginationOptions = {}
 		if (payload.pagination) {
 			paginationOptions = {
@@ -37,7 +37,18 @@ export class BuildingRepo {
 				workEndTime: payload.workEndTime,
 				workStartTime: payload.workStartTime,
 			},
-			select: { id: true, name: true, address: true, imageLink: true, phoneNumber: true, workEndTime: true, workStartTime: true, createdAt: true },
+			select: {
+				id: true,
+				name: true,
+				address: true,
+				imageLink: true,
+				phoneNumber: true,
+				workEndTime: true,
+				workStartTime: true,
+				latitude: true,
+				longitude: true,
+				createdAt: true,
+			},
 			...paginationOptions,
 			orderBy: [{ createdAt: 'desc' }],
 		})
@@ -67,7 +78,18 @@ export class BuildingRepo {
 	async getOneById(payload: BuildingGetOneByIdRequest): Promise<BuildingGetOneResponse> {
 		const building = await this.prisma.building.findFirst({
 			where: { deletedAt: null, id: payload.id },
-			select: { id: true, name: true, address: true, imageLink: true, phoneNumber: true, workEndTime: true, workStartTime: true, createdAt: true },
+			select: {
+				id: true,
+				name: true,
+				address: true,
+				imageLink: true,
+				phoneNumber: true,
+				workEndTime: true,
+				workStartTime: true,
+				latitude: true,
+				longitude: true,
+				createdAt: true,
+			},
 		})
 
 		return building
@@ -82,8 +104,21 @@ export class BuildingRepo {
 				phoneNumber: { contains: payload.phoneNumber, mode: 'insensitive' },
 				workEndTime: payload.workEndTime,
 				workStartTime: payload.workStartTime,
+				latitude: payload.latutude,
+				longitude: payload.longitude,
 			},
-			select: { id: true, name: true, address: true, imageLink: true, phoneNumber: true, workEndTime: true, workStartTime: true, createdAt: true },
+			select: {
+				id: true,
+				name: true,
+				address: true,
+				imageLink: true,
+				phoneNumber: true,
+				workEndTime: true,
+				workStartTime: true,
+				latitude: true,
+				longitude: true,
+				createdAt: true,
+			},
 		})
 
 		return building
@@ -92,7 +127,18 @@ export class BuildingRepo {
 	async getOneWithOr(payload: BuildingGetOneRequest): Promise<BuildingGetOneResponse> {
 		const building = await this.prisma.building.findFirst({
 			where: { OR: [{ name: payload.name, address: payload.address, phoneNumber: payload.phoneNumber }] },
-			select: { id: true, name: true, address: true, imageLink: true, phoneNumber: true, workEndTime: true, workStartTime: true, createdAt: true },
+			select: {
+				id: true,
+				name: true,
+				address: true,
+				imageLink: true,
+				phoneNumber: true,
+				workEndTime: true,
+				workStartTime: true,
+				latitude: true,
+				longitude: true,
+				createdAt: true,
+			},
 		})
 
 		return building
@@ -107,6 +153,8 @@ export class BuildingRepo {
 				phoneNumber: payload.phoneNumber,
 				workEndTime: payload.workEndTime,
 				workStartTime: payload.workStartTime,
+				latitude: payload.latitude,
+				longitude: payload.longitude,
 			},
 		})
 		return building
@@ -122,6 +170,8 @@ export class BuildingRepo {
 				phoneNumber: payload.phoneNumber,
 				workEndTime: payload.workEndTime,
 				workStartTime: payload.workStartTime,
+				latitude: payload.latitude,
+				longitude: payload.longitude,
 			},
 		})
 		return building

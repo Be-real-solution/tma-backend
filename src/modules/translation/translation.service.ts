@@ -22,6 +22,10 @@ export class TranslationService {
 		return this.repo.getAll(payload)
 	}
 
+	async getAll2(payload: TranslationGetAllRequest): Promise<TranslationGetOneResponse[]> {
+		return this.repo.getAll2(payload)
+	}
+
 	async create(payload: TranslationCreateRequest): Promise<MutationResponse> {
 		return this.repo.create(payload)
 	}

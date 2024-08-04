@@ -40,6 +40,14 @@ export class BuildingGetOneResponseDto implements BuildingGetOneResponse {
 	@IsNotEmpty()
 	workStartTime: string
 
+	@ApiProperty({ type: String })
+	@IsNotEmpty()
+	latitude: string
+
+	@ApiProperty({ type: String })
+	@IsNotEmpty()
+	longitude: string
+
 	@ApiProperty({ type: Date, example: new Date() })
 	@IsDateString()
 	@IsNotEmpty()

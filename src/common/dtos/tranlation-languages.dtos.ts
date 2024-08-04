@@ -1,6 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import { CreateInManyLangs, UpdateInManyLangs } from '../../interfaces'
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator'
+import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator'
+import { LanguageEnum } from '@prisma/client'
 
 export class CreateInManyLangsDto implements CreateInManyLangs {
 	@ApiProperty({ type: String })
@@ -34,4 +35,18 @@ export class UpdateInManyLangsDto implements UpdateInManyLangs {
 	@IsString()
 	@IsOptional()
 	uz?: string
+}
+
+export class LanguageDto {
+	@ApiProperty({
+		type: String,
+		examples: {
+			uz: { value: 'uz' },
+			ru: { value: 'ru' },
+			en: { value: 'en' },
+		},
+	})
+	@IsEnum(LanguageEnum)
+	@IsNotEmpty()
+	lang: LanguageEnum
 }

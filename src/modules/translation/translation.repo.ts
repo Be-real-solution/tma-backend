@@ -24,7 +24,21 @@ export class TranslationRepo {
 				language: payload.language,
 				tableField: { in: payload.tableFields },
 				tableId: { in: payload.tableIds },
-				text: { contains: payload.text, mode: 'insensitive' },
+				text: { contains: payload.text[0], mode: 'insensitive' },
+			},
+			select: { id: true, language: true, tableId: true, text: true, tableField: true },
+		})
+
+		return translations
+	}
+
+	async getAll2(payload: TranslationGetAllRequest): Promise<TranslationGetOneResponse[]> {
+		const translations = await this.prisma.translation.findMany({
+			where: {
+				language: payload.language,
+				tableField: { in: payload.tableFields },
+				tableId: { in: payload.tableIds },
+				text: { in: payload.text },
 			},
 			select: { id: true, language: true, tableId: true, text: true, tableField: true },
 		})

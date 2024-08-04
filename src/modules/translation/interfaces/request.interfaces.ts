@@ -5,7 +5,7 @@ export declare interface TranslationGetAllRequest {
 	language?: LanguageEnum
 	tableIds?: string[]
 	tableFields?: string[]
-	text?: string
+	text?: string[]
 }
 export declare interface TranslationGetOneByIdRequest {
 	id: string

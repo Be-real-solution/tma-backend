@@ -11,10 +11,9 @@ import {
 	BuildingUpdateRequestDto,
 } from './dtos'
 import { BuildingGetAllResponse, BuildingGetOneResponse } from './interfaces'
-import { AuthGuard, MutationResponseDto, PAGE_NUMBER, PAGE_SIZE, PAGINATION } from '../../common'
+import { AuthGuard, LanguageDto, MutationResponseDto, PAGE_NUMBER, PAGE_SIZE, PAGINATION } from '../../common'
 import { MutationResponse } from '../../interfaces'
 import { FileInterceptor } from '@nestjs/platform-express'
-import { LanguageEnum } from '@prisma/client'
 
 @ApiTags('building')
 @UseGuards(AuthGuard)
@@ -29,7 +28,7 @@ export class BuildingController {
 	@Get()
 	@ApiResponse({ type: BuildingGetAllResponseDto })
 	@ApiResponse({ type: BuildingGetOneResponseDto, isArray: true })
-	getAll(@Query() payload: BuildingGetAllRequestDto, @Headers('accept-language') lang: LanguageEnum): Promise<BuildingGetAllResponse | BuildingGetOneResponse[]> {
+	getAll(@Query() payload: BuildingGetAllRequestDto, @Headers() header: LanguageDto): Promise<BuildingGetAllResponse | BuildingGetOneResponse[]> {
 		return this.service.getAll(
 			{
 				...payload,
@@ -37,14 +36,14 @@ export class BuildingController {
 				pageSize: payload.pageSize ?? PAGE_SIZE,
 				pagination: [true, 'true'].includes(payload.pagination) ? PAGINATION : false,
 			},
-			lang,
+			header.lang,
 		)
 	}
 
 	@Get(':id')
 	@ApiResponse({ type: BuildingGetOneResponseDto })
-	getOneById(@Param() payload: BuildingGetOneByIdRequestDto, @Headers('accept-language') lang: LanguageEnum): Promise<BuildingGetOneResponse> {
-		return this.service.getOneById(payload, lang)
+	getOneById(@Param() payload: BuildingGetOneByIdRequestDto, @Headers() header: LanguageDto): Promise<BuildingGetOneResponse> {
+		return this.service.getOneById(payload, header.lang)
 	}
 
 	@Post()

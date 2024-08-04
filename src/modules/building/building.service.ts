@@ -26,7 +26,20 @@ export class BuildingService {
 	}
 
 	async getAll(payload: BuildingGetAllRequest, lang: LanguageEnum): Promise<BuildingGetAllResponse | BuildingGetOneResponse[]> {
-		const buildings = await this.repo.getAll(payload)
+		const searchedData = await this.translationService.getAll({
+			language: lang,
+			text: [payload.name, payload.address],
+			tableFields: [TranslatedTableFields.buildingName, TranslatedTableFields.buildingAddress],
+		})
+
+		const tableIds: string[] = []
+		for (const tr of searchedData) {
+			if (!tableIds.includes(tr.id)) {
+				tableIds.push(tr.id)
+			}
+		}
+
+		const buildings = await this.repo.getAll({ ...payload, ids: tableIds, name: undefined, address: undefined })
 
 		let mappedBuildings
 		const translations = await this.translationService.getAll({
@@ -97,12 +110,19 @@ export class BuildingService {
 	}
 
 	async create(payload: BuildingCreateRequest): Promise<MutationResponse> {
-		const candidate = await this.getOneWithOr({ name: payload.name['en'], address: payload.address['en'], phoneNumber: payload.phoneNumber })
-		if (candidate) {
-			throw new BadRequestException(
-				`this ${candidate.name === payload.name['en'] ? 'name' : candidate.address === payload.address['en'] ? 'address' : 'phone number'} already exists`,
-			)
+		const existsInTr = await this.translationService.getAll2({ text: [payload.name.uz, payload.name.ru, payload.name.en], tableFields: [TranslatedTableFields.buildingName] })
+		if (existsInTr.length) {
+			throw new BadRequestException('building name already exists')
 		}
+
+		const existsInTr2 = await this.translationService.getAll2({
+			text: [payload.address.uz, payload.address.ru, payload.address.en],
+			tableFields: [TranslatedTableFields.buildingAddress],
+		})
+		if (existsInTr2.length) {
+			throw new BadRequestException('building address already exists')
+		}
+
 		const building = await this.repo.create(payload)
 		await this.createInManyLang(building.id, payload, 'create')
 		return building
@@ -119,18 +139,22 @@ export class BuildingService {
 	}
 
 	private async checkUpdateFields(param: BuildingGetOneByIdRequest, payload: BuildingUpdateRequest): Promise<void> {
-		if (payload.name) {
-			const c1 = await this.repo.getOne({ name: payload.name['en'] })
-			if (c1 && c1.id !== param.id) {
-				throw new BadRequestException('this name already exists')
-			}
+		if (Object.values(payload.name).length) {
+			const c1 = await this.translationService.getAll2({ text: Object.values(payload.name), tableFields: [TranslatedTableFields.buildingName] })
+			c1.forEach((c) => {
+				if (c && c.id !== param.id) {
+					throw new BadRequestException('this name already exists')
+				}
+			})
 		}
 
-		if (payload.address) {
-			const c2 = await this.repo.getOne({ address: payload.address['en'] })
-			if (c2 && c2.id !== param.id) {
-				throw new BadRequestException('this address already exists')
-			}
+		if (Object.values(payload.address).length) {
+			const c1 = await this.translationService.getAll2({ text: Object.values(payload.address), tableFields: [TranslatedTableFields.buildingAddress] })
+			c1.forEach((c) => {
+				if (c && c.id !== param.id) {
+					throw new BadRequestException('this address already exists')
+				}
+			})
 		}
 
 		if (payload.phoneNumber) {

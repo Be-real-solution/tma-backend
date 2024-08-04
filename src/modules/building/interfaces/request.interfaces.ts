@@ -19,11 +19,15 @@ export declare interface BuildingGetOneRequest {
 	phoneNumber?: string
 	workEndTime?: string
 	workStartTime?: string
+	latutude?: string
+	longitude?: string
 }
 
 export declare interface BuildingCreateRequest {
 	name: CreateInManyLangs
 	address: CreateInManyLangs
+	latitude: string
+	longitude: string
 	phoneNumber: string
 	workEndTime: string
 	workStartTime: string
@@ -33,6 +37,8 @@ export declare interface BuildingCreateRequest {
 export declare interface BuildingUpdateRequest {
 	name?: UpdateInManyLangs
 	address?: UpdateInManyLangs
+	latitude?: string
+	longitude?: string
 	phoneNumber?: string
 	workEndTime?: string
 	workStartTime?: string
