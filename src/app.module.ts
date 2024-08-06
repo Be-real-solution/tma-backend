@@ -4,7 +4,7 @@ import { PrismaModule } from './prisma'
 import { databaseConfig } from './configs'
 import { ServeStaticModule } from '@nestjs/serve-static'
 import { join } from 'path'
-import { AuthModule, AuthorModule, BuildingModule, NewImageModule, NewModule, TranslationModule } from './modules'
+import { AuthModule, AuthorModule, BuildingModule, CategoryModule, NewImageModule, NewModule, TranslationModule } from './modules'
 import { JwtModule } from '@nestjs/jwt'
 import { MulterModule } from '@nestjs/platform-express'
 import * as multer from 'multer'
@@ -44,6 +44,7 @@ import { extname } from 'path'
 		AuthModule,
 		AuthorModule,
 		BuildingModule,
+		CategoryModule,
 		NewModule,
 		NewImageModule,
 		TranslationModule,

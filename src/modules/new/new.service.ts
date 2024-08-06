@@ -20,7 +20,20 @@ export class NewService {
 	}
 
 	async getAll(payload: NewGetAllRequest, lang: LanguageEnum): Promise<NewGetAllResponse | NewGetOneResponse[]> {
-		const news = await this.repo.getAll(payload)
+		const searchedData = await this.translationService.getAll({
+			language: lang,
+			text: [payload.name, payload.description],
+			tableFields: [TranslatedTableFields.newName, TranslatedTableFields.newDescription],
+		})
+
+		const tableIds: string[] = []
+		for (const tr of searchedData) {
+			if (!tableIds.includes(tr.id)) {
+				tableIds.push(tr.id)
+			}
+		}
+
+		const news = await this.repo.getAll({ ...payload, ids: tableIds })
 
 		let mappedNews
 		const translations = await this.translationService.getAll({
@@ -85,10 +98,11 @@ export class NewService {
 	}
 
 	async create(payload: NewCreateRequest): Promise<MutationResponse> {
-		const candidate = await this.getOne({ name: payload.name['en'] })
-		if (candidate) {
-			throw new BadRequestException(`this name already exists`)
+		const existsInTr = await this.translationService.getAll2({ text: [payload.name.uz, payload.name.ru, payload.name.en], tableFields: [TranslatedTableFields.newName] })
+		if (existsInTr.length) {
+			throw new BadRequestException('new name already exists')
 		}
+
 		const neww = await this.repo.create(payload)
 		await this.newImageService.createMany({ datas: payload.imageLinks.map((i) => ({ newId: neww.id, imageLink: i.filename })) })
 		await this.createInManyLang(neww.id, payload, 'create')
@@ -97,12 +111,7 @@ export class NewService {
 	}
 
 	async update(param: NewGetOneByIdRequest, payload: NewUpdateRequest): Promise<MutationResponse> {
-		if (payload.name) {
-			const candidate = await this.getOne({ name: payload.name['en'] })
-			if (candidate && candidate.id !== param.id) {
-				throw new BadRequestException(`this name already exists`)
-			}
-		}
+		await this.checkUpdateFields(param, payload)
 
 		const updatedNew = await this.repo.update({ ...param, ...payload })
 		await this.newImageService.deleteMany({ ids: payload.imagesToDelete })
@@ -114,6 +123,17 @@ export class NewService {
 
 	async delete(payload: NewDeleteRequest): Promise<MutationResponse> {
 		return this.repo.delete(payload)
+	}
+
+	private async checkUpdateFields(param: NewGetOneByIdRequest, payload: NewUpdateRequest): Promise<void> {
+		if (Object.values(payload.name).length) {
+			const c1 = await this.translationService.getAll2({ text: Object.values(payload.name), tableFields: [TranslatedTableFields.newName] })
+			c1.forEach((c) => {
+				if (c && c.id !== param.id) {
+					throw new BadRequestException('this name already exists')
+				}
+			})
+		}
 	}
 
 	private async createInManyLang(id: string, payload: NewUpdateRequest, functionality: string): Promise<void> {

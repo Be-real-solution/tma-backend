@@ -10,7 +10,7 @@ export class NewRepo {
 		this.prisma = prisma
 	}
 
-	async getAll(payload: NewGetAllRequest): Promise<NewGetAllResponse | NewGetOneResponse[]> {
+	async getAll(payload: NewGetAllRequest & { ids?: string[] }): Promise<NewGetAllResponse | NewGetOneResponse[]> {
 		let paginationOptions = {}
 		if (payload.pagination) {
 			paginationOptions = {
@@ -25,6 +25,7 @@ export class NewRepo {
 				name: { contains: payload.name, mode: 'insensitive' },
 				description: { contains: payload.description, mode: 'insensitive' },
 				authorId: payload.authorId,
+				categoryId: payload.categoryId,
 			},
 			select: { id: true, name: true, description: true, authorId: true, viewsCount: true, createdAt: true },
 			...paginationOptions,
@@ -38,6 +39,7 @@ export class NewRepo {
 					name: { contains: payload.name, mode: 'insensitive' },
 					description: { contains: payload.description, mode: 'insensitive' },
 					authorId: payload.authorId,
+					categoryId: payload.categoryId,
 				},
 			})
 
@@ -67,6 +69,7 @@ export class NewRepo {
 				name: payload.name,
 				description: payload.description,
 				authorId: payload.authorId,
+				categoryId: payload.categoryId,
 			},
 			select: { id: true, name: true, description: true, authorId: true, viewsCount: true, createdAt: true },
 		})
@@ -79,6 +82,7 @@ export class NewRepo {
 			data: {
 				name: payload.name['en'] || Object.keys(payload.name)[0] || '',
 				description: payload.description['en'] || Object.keys(payload.description)[0] || '',
+				categoryId: payload.categoryId,
 				authorId: payload.authorId,
 			},
 		})
@@ -91,6 +95,7 @@ export class NewRepo {
 			data: {
 				name: payload.name['en'] ?? undefined,
 				description: payload.description['en'] ?? undefined,
+				categoryId: payload.categoryId,
 				authorId: payload.authorId,
 				viewsCount: payload.viewsCount,
 			},
