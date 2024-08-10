@@ -1,3 +1,5 @@
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+
 -- CreateEnum
 CREATE TYPE "LanguageEnum" AS ENUM ('uz', 'ru', 'en');
 
