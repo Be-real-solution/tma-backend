@@ -1,6 +1,7 @@
 export * from './auth'
 export * from './author'
 export * from './building'
+export * from './carousel'
 export * from './category'
 export * from './new'
 export * from './new-image'

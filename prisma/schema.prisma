@@ -104,3 +104,17 @@ model Translation {
   @@id([ id ])
   @@map("translation")
 }
+
+model Carousel {
+  id           String     @map("id")           @db.Uuid          @default(dbgenerated("GEN_RANDOM_UUID()"))
+  name         String     @map("name")         @db.VarChar() 
+  description  String     @map("description")  @db.VarChar()
+  imageLink    String     @map("image_link")   @db.VarChar()
+  isActive     Boolean    @map("is_active")    @db.Boolean       @default(true)
+  createdAt    DateTime   @map("created_at")   @db.Timestamp     @default(now())
+  updatedAt    DateTime   @map("updated_at")   @db.Timestamp     @updatedAt
+  deletedAt    DateTime?  @map("deleted_at")   @db.Timestamp
+
+  @@id([ id ])
+  @@map("carousel")
+}
