@@ -6,7 +6,6 @@ import { isUUID } from 'class-validator'
 
 export const UserIdInRefresh = createParamDecorator(async (data: unknown, ctx: ExecutionContext) => {
 	const request = ctx.switchToHttp().getRequest<Request>()
-	console.log(request.headers.authorization)
 
 	const authorization = request.headers.authorization
 	if (!authorization) {

@@ -48,5 +48,5 @@ export class LanguageDto {
 	})
 	@IsEnum(LanguageEnum)
 	@IsNotEmpty()
-	lang: LanguageEnum
+	['accept-language']: LanguageEnum
 }

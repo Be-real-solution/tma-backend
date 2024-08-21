@@ -26,7 +26,7 @@ export declare interface NewCreateRequest {
 	authorId: string
 	categoryId: string
 	//=
-	imageLinks?: Array<Express.Multer.File>
+	images?: Array<Express.Multer.File>
 }
 
 export declare interface NewUpdateRequest {
@@ -36,7 +36,7 @@ export declare interface NewUpdateRequest {
 	viewsCount?: number
 	categoryId?: string
 	//=
-	imageLinks?: Array<Express.Multer.File>
+	images?: Array<Express.Multer.File>
 	imagesToDelete?: string[]
 }
 

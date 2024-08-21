@@ -37,15 +37,19 @@ export class AuthorService {
 		return author
 	}
 
-	async create(paylaod: AuthorCreateRequest): Promise<MutationResponse> {
-		const candidate = await this.getOne({ fullName: paylaod.fullName })
+	async create(payload: AuthorCreateRequest): Promise<MutationResponse> {
+		const candidate = await this.getOne({ fullName: payload.fullName })
 		if (candidate) {
 			return candidate
 		}
-		return this.repo.create(paylaod)
+		return this.repo.create(payload)
 	}
 
 	async update(param: AuthorGetOneByIdRequest, payload: AuthorUpdateRequest): Promise<MutationResponse> {
+		const ca = await this.getOne(param)
+		if (!ca) {
+			throw new BadRequestException('author not found')
+		}
 		return this.repo.update({ ...param, ...payload })
 	}
 

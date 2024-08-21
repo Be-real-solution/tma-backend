@@ -88,7 +88,7 @@ export class CarouselRepo {
 			data: {
 				name: payload.name['en'] || Object.keys(payload.name)[0] || '',
 				description: payload.description['en'] || Object.keys(payload.description)[0] || '',
-				imageLink: payload.imageLink,
+				imageLink: payload.image,
 			},
 		})
 		return carousel
@@ -98,9 +98,9 @@ export class CarouselRepo {
 		const carousel = await this.prisma.carousel.update({
 			where: { deletedAt: null, id: payload.id },
 			data: {
-				name: payload.name['en'] ?? undefined,
-				description: payload.description['en'] ?? undefined,
-				imageLink: payload.imageLink,
+				name: payload.name?.en ?? undefined,
+				description: payload.description?.en ?? undefined,
+				imageLink: payload.image,
 			},
 		})
 		return carousel

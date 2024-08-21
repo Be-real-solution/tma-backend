@@ -31,7 +31,7 @@ export declare interface BuildingCreateRequest {
 	phoneNumber: string
 	workEndTime: string
 	workStartTime: string
-	imageLink: string
+	image?: string
 }
 
 export declare interface BuildingUpdateRequest {
@@ -42,7 +42,7 @@ export declare interface BuildingUpdateRequest {
 	phoneNumber?: string
 	workEndTime?: string
 	workStartTime?: string
-	imageLink?: string
+	image?: string
 }
 
 export declare interface BuildingDeleteRequest {

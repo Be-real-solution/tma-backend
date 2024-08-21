@@ -1,6 +1,6 @@
-import { Body, Controller, Delete, Get, Headers, Param, Patch, Post, Query, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common'
+import { BadRequestException, Body, Controller, Delete, Get, Headers, Param, Patch, Post, Query, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common'
 import { NewService } from './new.service'
-import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { ApiBearerAuth, ApiConsumes, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { NewCreateRequestDto, NewDeleteRequestDto, NewGetAllRequestDto, NewGetAllResponseDto, NewGetOneByIdRequestDto, NewGetOneResponseDto, NewUpdateRequestDto } from './dtos'
 import { NewGetAllResponse, NewGetOneResponse } from './interfaces'
 import { AuthGuard, LanguageGuard, MutationResponseDto, PAGE_NUMBER, PAGE_SIZE, PAGINATION } from '../../common'
@@ -41,17 +41,24 @@ export class NewController {
 	}
 
 	@Post()
+	@ApiConsumes('multipart/form-data')
 	@UseInterceptors(FilesInterceptor('images'))
 	@ApiResponse({ type: MutationResponseDto })
 	create(@Body() payload: NewCreateRequestDto, @UploadedFiles() images: Array<Express.Multer.File>): Promise<MutationResponse> {
-		return this.service.create({ ...payload, imageLinks: images })
+		if (!images.length) {
+			throw new BadRequestException('must have at least 1 image')
+		}
+
+		console.log(payload, images)
+		return this.service.create({ ...payload, images: images })
 	}
 
 	@Patch(':id')
+	@ApiConsumes('multipart/form-data')
 	@UseInterceptors(FilesInterceptor('images'))
 	@ApiResponse({ type: MutationResponseDto })
 	update(@Param() param: NewGetOneByIdRequestDto, @Body() payload: NewUpdateRequestDto, @UploadedFiles() images: Array<Express.Multer.File>): Promise<MutationResponse> {
-		return this.service.update(param, { ...payload, imageLinks: images })
+		return this.service.update(param, { ...payload, images: images })
 	}
 
 	@Delete(':id')

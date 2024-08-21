@@ -149,24 +149,24 @@ export class BuildingRepo {
 			data: {
 				name: payload.name['en'] || Object.keys(payload.name)[0] || '',
 				address: payload.address['en'] || Object.keys(payload.address)[0] || '',
-				imageLink: payload.imageLink,
 				phoneNumber: payload.phoneNumber,
 				workEndTime: payload.workEndTime,
 				workStartTime: payload.workStartTime,
 				latitude: payload.latitude,
 				longitude: payload.longitude,
+				imageLink: payload.image,
 			},
 		})
-		return building
+		return { id: building.id }
 	}
 
 	async update(payload: BuildingUpdateRequest & BuildingGetOneByIdRequest): Promise<MutationResponse> {
 		const building = await this.prisma.building.update({
 			where: { deletedAt: null, id: payload.id },
 			data: {
-				name: payload.name['en'] ?? undefined,
-				address: payload.address['en'] ?? undefined,
-				imageLink: payload.imageLink,
+				name: payload.name?.en ?? undefined,
+				address: payload.address?.en ?? undefined,
+				imageLink: payload.image,
 				phoneNumber: payload.phoneNumber,
 				workEndTime: payload.workEndTime,
 				workStartTime: payload.workStartTime,
@@ -174,7 +174,7 @@ export class BuildingRepo {
 				longitude: payload.longitude,
 			},
 		})
-		return building
+		return { id: building.id }
 	}
 
 	async delete(payload: BuildingDeleteRequest): Promise<MutationResponse> {

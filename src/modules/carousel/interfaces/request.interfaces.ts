@@ -21,14 +21,14 @@ export declare interface CarouselCreateRequest {
 	name: CreateInManyLangs
 	description: CreateInManyLangs
 	//=
-	imageLink?: string
+	image?: string
 }
 
 export declare interface CarouselUpdateRequest {
 	name?: UpdateInManyLangs
 	description?: UpdateInManyLangs
 	//=
-	imageLink?: string
+	image?: string
 }
 
 export declare interface CarouselDeleteRequest {

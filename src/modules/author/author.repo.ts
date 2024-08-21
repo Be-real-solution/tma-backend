@@ -53,6 +53,7 @@ export class AuthorRepo {
 	async getOneById(payload: AuthorGetOneByIdRequest): Promise<AuthorGetOneResponse> {
 		const author = await this.prisma.author.findFirst({
 			where: { deletedAt: null, id: payload.id },
+			select: { id: true, fullName: true, createdAt: true },
 		})
 
 		return author
@@ -61,6 +62,7 @@ export class AuthorRepo {
 	async getOne(payload: AuthorGetOneRequest): Promise<AuthorGetOneResponse> {
 		const author = await this.prisma.author.findFirst({
 			where: { deletedAt: null, id: payload.id, fullName: payload.fullName },
+			select: { id: true, fullName: true, createdAt: true },
 		})
 
 		return author
@@ -71,7 +73,7 @@ export class AuthorRepo {
 			data: { fullName: payload.fullName },
 		})
 
-		return author
+		return { id: author.id }
 	}
 
 	async update(payload: AuthorUpdateRequest & AuthorGetOneByIdRequest): Promise<MutationResponse> {
@@ -80,7 +82,7 @@ export class AuthorRepo {
 			data: { fullName: payload.fullName },
 		})
 
-		return author
+		return { id: author.id }
 	}
 
 	async delete(payload: AuthorDeleteRequest): Promise<MutationResponse> {

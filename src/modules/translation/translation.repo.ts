@@ -19,12 +19,16 @@ export class TranslationRepo {
 	}
 
 	async getAll(payload: TranslationGetAllRequest): Promise<TranslationGetOneResponse[]> {
+		let filteredText: string[] = []
+		if (Array.isArray(payload.text)) {
+			filteredText = payload.text.filter((t) => t !== undefined && t !== null)
+		}
 		const translations = await this.prisma.translation.findMany({
 			where: {
 				language: payload.language,
 				tableField: { in: payload.tableFields },
 				tableId: { in: payload.tableIds },
-				text: { contains: payload.text[0], mode: 'insensitive' },
+				...{ OR: filteredText.length ? filteredText.map((t) => ({ text: { contains: t, mode: 'insensitive' } })) : undefined },
 			},
 			select: { id: true, language: true, tableId: true, text: true, tableField: true },
 		})
@@ -91,5 +95,11 @@ export class TranslationRepo {
 			where: { id: payload.id },
 		})
 		return payload
+	}
+
+	async deleteMany(payload: { tableId: string }): Promise<void> {
+		await this.prisma.translation.deleteMany({
+			where: { tableId: payload.tableId },
+		})
 	}
 }

@@ -88,6 +88,9 @@ export class NewCreateRequestDto implements NewCreateRequest {
 	@IsUUID('4')
 	@IsNotEmpty()
 	categoryId: string
+
+	@ApiProperty({ type: 'string', format: 'binary', isArray: true })
+	images?: any[]
 }
 
 export class NewUpdateRequestDto implements NewUpdateRequest {
@@ -123,6 +126,9 @@ export class NewUpdateRequestDto implements NewUpdateRequest {
 	@IsUUID('4')
 	@IsOptional()
 	imagesToDelete?: string[]
+
+	@ApiProperty({ type: 'string', format: 'binary', isArray: true })
+	images?: any[]
 }
 
 export class NewDeleteRequestDto implements NewDeleteRequest {

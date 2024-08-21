@@ -43,19 +43,18 @@ export class BuildingGetOneByIdRequestDto implements BuildingGetOneByIdRequest {
 export class BuildingCreateRequestDto implements BuildingCreateRequest {
 	@ApiProperty({ type: CreateInManyLangsDto })
 	@ValidateNested()
-	@IsNotEmpty()
 	@Type(() => CreateInManyLangsDto)
+	@IsNotEmpty()
 	name: CreateInManyLangs
 
 	@ApiProperty({ type: CreateInManyLangsDto })
 	@ValidateNested()
-	@IsNotEmpty()
 	@Type(() => CreateInManyLangsDto)
+	@IsNotEmpty()
 	address: CreateInManyLangs
 
-	@ApiProperty({ type: String, format: 'binary' })
-	@IsNotEmpty()
-	imageLink: string
+	@ApiProperty({ type: 'string', format: 'binary' })
+	image?: any
 
 	@ApiProperty({ type: String })
 	@IsPhoneNumber('UZ')
@@ -96,9 +95,8 @@ export class BuildingUpdateRequestDto implements BuildingUpdateRequest {
 	@Type(() => UpdateInManyLangsDto)
 	address?: UpdateInManyLangs
 
-	@ApiPropertyOptional({ type: String, format: 'binary' })
-	@IsOptional()
-	imageLink?: string
+	@ApiPropertyOptional({ type: 'string', format: 'binary' })
+	image?: any
 
 	@ApiPropertyOptional({ type: String })
 	@IsPhoneNumber('UZ')

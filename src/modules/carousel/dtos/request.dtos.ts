@@ -54,37 +54,35 @@ export class CarouselGetOneRequestDto implements CarouselGetOneRequest {
 export class CarouselCreateRequestDto implements CarouselCreateRequest {
 	@ApiProperty({ type: CreateInManyLangsDto })
 	@ValidateNested()
-	@IsNotEmpty()
 	@Type(() => CreateInManyLangsDto)
+	@IsNotEmpty()
 	name: CreateInManyLangs
 
 	@ApiProperty({ type: CreateInManyLangsDto })
 	@ValidateNested()
-	@IsNotEmpty()
 	@Type(() => CreateInManyLangsDto)
+	@IsNotEmpty()
 	description: CreateInManyLangs
 
-	@ApiProperty({ type: String, format: 'binary' })
-	@IsNotEmpty()
-	imageLink: string
+	@ApiProperty({ type: 'string', format: 'binary' })
+	image?: any
 }
 
 export class CarouselUpdateRequestDto implements CarouselUpdateRequest {
 	@ApiPropertyOptional({ type: UpdateInManyLangsDto })
 	@ValidateNested()
-	@IsOptional()
 	@Type(() => UpdateInManyLangsDto)
+	@IsOptional()
 	name?: UpdateInManyLangs
 
 	@ApiPropertyOptional({ type: UpdateInManyLangsDto })
 	@ValidateNested()
-	@IsOptional()
 	@Type(() => UpdateInManyLangsDto)
+	@IsOptional()
 	description?: UpdateInManyLangs
 
-	@ApiPropertyOptional({ type: String, format: 'binary' })
-	@IsOptional()
-	imageLink?: string
+	@ApiPropertyOptional({ type: 'string', format: 'binary' })
+	image?: any
 }
 
 export class CarouselDeleteRequestDto implements CarouselDeleteRequest {

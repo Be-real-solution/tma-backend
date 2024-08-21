@@ -26,16 +26,17 @@ export class CarouselService {
 	}
 
 	async getAll(payload: CarouselGetAllRequest, lang: LanguageEnum): Promise<CarouselGetAllResponse | CarouselGetOneResponse[]> {
+		console.log(payload, lang)
 		const searchedData = await this.translationService.getAll({
 			language: lang,
-			text: [payload.name, payload.description],
+			text: [payload.name ?? '', payload.description ?? ''],
 			tableFields: [TranslatedTableFields.carouselName, TranslatedTableFields.carouselDescription],
 		})
 
 		const tableIds: string[] = []
 		for (const tr of searchedData) {
-			if (!tableIds.includes(tr.id)) {
-				tableIds.push(tr.id)
+			if (!tableIds.includes(tr.tableId)) {
+				tableIds.push(tr.tableId)
 			}
 		}
 
@@ -44,7 +45,7 @@ export class CarouselService {
 		let mappedCarousels
 		const translations = await this.translationService.getAll({
 			language: lang,
-			tableFields: [TranslatedTableFields.newName, TranslatedTableFields.newDescription],
+			tableFields: [TranslatedTableFields.carouselName, TranslatedTableFields.carouselDescription],
 			tableIds: Array.isArray(carousels) ? carousels.map((n) => n.id) : carousels.data.map((n) => n.id),
 		})
 
@@ -110,32 +111,56 @@ export class CarouselService {
 	}
 
 	async update(param: CarouselGetOneByIdRequest, payload: CarouselUpdateRequest): Promise<MutationResponse> {
+		const ca = await this.getOne(param)
+		if (!ca) {
+			throw new BadRequestException('carousel not found')
+		}
+
 		// await this.checkUpdateFields(param, payload)
 
-		return this.repo.update({ ...param, ...payload })
+		const carousel = await this.repo.update({ ...param, ...payload })
+		await this.createInManyLang(carousel.id, payload, 'update')
+		return carousel
 	}
 
 	async delete(payload: CarouselDeleteRequest): Promise<MutationResponse> {
-		return this.repo.delete(payload)
+		const carousel = await this.repo.delete(payload)
+		await this.translationService.deleteMany({ tableId: carousel.id })
+
+		return carousel
 	}
 
 	private async checkUpdateFields(param: CarouselGetOneByIdRequest, payload: CarouselUpdateRequest): Promise<void> {
-		if (Object.values(payload.name).length) {
-			const c1 = await this.translationService.getAll2({ text: Object.values(payload.name), tableFields: [TranslatedTableFields.carouselName] })
-			c1.forEach((c) => {
-				if (c && c.id !== param.id) {
-					throw new BadRequestException('this name already exists')
-				}
-			})
+		if (payload.name && Object.values(payload.name).length) {
+			const texts = Object.values(payload.name).filter((t) => t !== undefined && t !== null)
+
+			if (Object.values(payload.name).length) {
+				const c1 = await this.translationService.getAll2({
+					text: texts,
+					tableFields: [TranslatedTableFields.carouselName],
+				})
+				c1.forEach((c) => {
+					if (c && c.id !== param.id) {
+						throw new BadRequestException('this name already exists')
+					}
+				})
+			}
 		}
 
-		if (Object.values(payload.description).length) {
-			const c1 = await this.translationService.getAll2({ text: Object.values(payload.description), tableFields: [TranslatedTableFields.carouselDescription] })
-			c1.forEach((c) => {
-				if (c && c.id !== param.id) {
-					throw new BadRequestException('this description already exists')
-				}
-			})
+		if (payload.description && Object.values(payload.description).length) {
+			const texts = Object.values(payload.description).filter((t) => t !== undefined && t !== null)
+
+			if (Object.values(payload.description).length) {
+				const c1 = await this.translationService.getAll2({
+					text: texts,
+					tableFields: [TranslatedTableFields.carouselDescription],
+				})
+				c1.forEach((c) => {
+					if (c && c.id !== param.id) {
+						throw new BadRequestException('this description already exists')
+					}
+				})
+			}
 		}
 	}
 
@@ -158,41 +183,45 @@ export class CarouselService {
 				],
 			})
 		} else {
-			for (const k of Object.keys(payload.name)) {
-				const exists = await this.translationService.getAll({
-					language: k as LanguageEnum,
-					tableFields: [TranslatedTableFields.carouselName],
-					tableIds: [id],
-				})
-
-				if (exists.length) {
-					await this.translationService.update({ id: exists[0].id }, { text: payload.name[k as LanguageEnum] })
-				} else {
-					await this.translationService.create({
+			if (payload.name && Object.values(payload.name).length) {
+				for (const k of Object.keys(payload.name)) {
+					const exists = await this.translationService.getAll({
 						language: k as LanguageEnum,
-						tableField: TranslatedTableFields.carouselName,
-						tableId: id,
-						text: payload.name[k as LanguageEnum],
+						tableFields: [TranslatedTableFields.carouselName],
+						tableIds: [id],
 					})
+
+					if (exists.length) {
+						await this.translationService.update({ id: exists[0].id }, { text: payload.name[k as LanguageEnum] })
+					} else {
+						await this.translationService.create({
+							language: k as LanguageEnum,
+							tableField: TranslatedTableFields.carouselName,
+							tableId: id,
+							text: payload.name[k as LanguageEnum],
+						})
+					}
 				}
 			}
 
-			for (const k of Object.keys(payload.description)) {
-				const exists = await this.translationService.getAll({
-					language: k as LanguageEnum,
-					tableFields: [TranslatedTableFields.carouselDescription],
-					tableIds: [id],
-				})
-
-				if (exists.length) {
-					await this.translationService.update({ id: exists[0].id }, { text: payload.description[k as LanguageEnum] })
-				} else {
-					await this.translationService.create({
+			if (payload.description && Object.values(payload.description).length) {
+				for (const k of Object.keys(payload.description)) {
+					const exists = await this.translationService.getAll({
 						language: k as LanguageEnum,
-						tableField: TranslatedTableFields.carouselDescription,
-						tableId: id,
-						text: payload.description[k as LanguageEnum],
+						tableFields: [TranslatedTableFields.carouselDescription],
+						tableIds: [id],
 					})
+
+					if (exists.length) {
+						await this.translationService.update({ id: exists[0].id }, { text: payload.description[k as LanguageEnum] })
+					} else {
+						await this.translationService.create({
+							language: k as LanguageEnum,
+							tableField: TranslatedTableFields.carouselDescription,
+							tableId: id,
+							text: payload.description[k as LanguageEnum],
+						})
+					}
 				}
 			}
 		}

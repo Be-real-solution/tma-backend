@@ -37,15 +37,19 @@ export class CategoryService {
 		return category
 	}
 
-	async create(paylaod: CategoryCreateRequest): Promise<MutationResponse> {
-		const candidate = await this.getOne({ name: paylaod.name })
+	async create(payload: CategoryCreateRequest): Promise<MutationResponse> {
+		const candidate = await this.getOne({ name: payload.name })
 		if (candidate) {
 			return candidate
 		}
-		return this.repo.create(paylaod)
+		return this.repo.create(payload)
 	}
 
 	async update(param: CategoryGetOneByIdRequest, payload: CategoryUpdateRequest): Promise<MutationResponse> {
+		const ca = await this.getOne(param)
+		if (!ca) {
+			throw new BadRequestException('category not found')
+		}
 		return this.repo.update({ ...param, ...payload })
 	}
 

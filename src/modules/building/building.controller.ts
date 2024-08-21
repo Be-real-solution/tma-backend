@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Headers, Param, Patch, Post, Query, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common'
+import { BadRequestException, Body, Controller, Delete, Get, Headers, Param, Patch, Post, Query, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common'
 import { BuildingService } from './building.service'
 import { ApiBearerAuth, ApiConsumes, ApiResponse, ApiTags } from '@nestjs/swagger'
 import {
@@ -36,14 +36,14 @@ export class BuildingController {
 				pageSize: payload.pageSize ?? PAGE_SIZE,
 				pagination: [true, 'true'].includes(payload.pagination) ? PAGINATION : false,
 			},
-			header.lang,
+			header['accept-language'],
 		)
 	}
 
 	@Get(':id')
 	@ApiResponse({ type: BuildingGetOneResponseDto })
 	getOneById(@Param() payload: BuildingGetOneByIdRequestDto, @Headers() header: LanguageDto): Promise<BuildingGetOneResponse> {
-		return this.service.getOneById(payload, header.lang)
+		return this.service.getOneById(payload, header['accept-language'])
 	}
 
 	@Post()
@@ -51,7 +51,10 @@ export class BuildingController {
 	@UseInterceptors(FileInterceptor('image'))
 	@ApiResponse({ type: MutationResponseDto })
 	create(@Body() payload: BuildingCreateRequestDto, @UploadedFile() image: Express.Multer.File): Promise<MutationResponse> {
-		return this.service.create({ ...payload, imageLink: image.filename })
+		if (!image) {
+			throw new BadRequestException('image cannot be empty')
+		}
+		return this.service.create({ ...payload, image: image.filename })
 	}
 
 	@Patch(':id')
@@ -59,7 +62,7 @@ export class BuildingController {
 	@UseInterceptors(FileInterceptor('image'))
 	@ApiResponse({ type: MutationResponseDto })
 	update(@Param() param: BuildingGetOneByIdRequestDto, @Body() payload: BuildingUpdateRequestDto, @UploadedFile() image: Express.Multer.File): Promise<MutationResponse> {
-		return this.service.update(param, { ...payload, imageLink: image.filename ?? undefined })
+		return this.service.update(param, { ...payload, image: image ? image?.filename || undefined : undefined })
 	}
 
 	@Delete(':id')

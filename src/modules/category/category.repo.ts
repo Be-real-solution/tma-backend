@@ -53,6 +53,7 @@ export class CategoryRepo {
 	async getOneById(payload: CategoryGetOneByIdRequest): Promise<CategoryGetOneResponse> {
 		const category = await this.prisma.category.findFirst({
 			where: { deletedAt: null, id: payload.id },
+			select: { id: true, name: true, createdAt: true },
 		})
 
 		return category
@@ -61,6 +62,7 @@ export class CategoryRepo {
 	async getOne(payload: CategoryGetOneRequest): Promise<CategoryGetOneResponse> {
 		const category = await this.prisma.category.findFirst({
 			where: { deletedAt: null, id: payload.id, name: payload.name },
+			select: { id: true, name: true, createdAt: true },
 		})
 
 		return category
@@ -71,7 +73,7 @@ export class CategoryRepo {
 			data: { name: payload.name },
 		})
 
-		return category
+		return { id: category.id }
 	}
 
 	async update(payload: CategoryUpdateRequest & CategoryGetOneByIdRequest): Promise<MutationResponse> {
@@ -80,7 +82,7 @@ export class CategoryRepo {
 			data: { name: payload.name },
 		})
 
-		return category
+		return { id: category.id }
 	}
 
 	async delete(payload: CategoryDeleteRequest): Promise<MutationResponse> {

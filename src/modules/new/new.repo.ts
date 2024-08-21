@@ -86,21 +86,21 @@ export class NewRepo {
 				authorId: payload.authorId,
 			},
 		})
-		return neww
+		return { id: neww.id }
 	}
 
 	async update(payload: NewUpdateRequest & NewGetOneByIdRequest): Promise<MutationResponse> {
 		const neww = await this.prisma.new.update({
 			where: { deletedAt: null, id: payload.id },
 			data: {
-				name: payload.name['en'] ?? undefined,
-				description: payload.description['en'] ?? undefined,
+				name: payload.name?.en ?? undefined,
+				description: payload.description?.en ?? undefined,
 				categoryId: payload.categoryId,
 				authorId: payload.authorId,
 				viewsCount: payload.viewsCount,
 			},
 		})
-		return neww
+		return { id: neww.id }
 	}
 
 	async delete(payload: NewDeleteRequest): Promise<MutationResponse> {

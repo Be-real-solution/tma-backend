@@ -41,4 +41,8 @@ export class TranslationService {
 	async delete(payload: TranslationDeleteRequest): Promise<MutationResponse> {
 		return this.repo.delete(payload)
 	}
+
+	async deleteMany(payload: { tableId: string }): Promise<void> {
+		await this.repo.deleteMany(payload)
+	}
 }
