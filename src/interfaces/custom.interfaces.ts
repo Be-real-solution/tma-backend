@@ -1,6 +1,9 @@
 export declare interface CustomResponse {
 	[key: string]: string
 }
+export declare interface CustomResponse2 {
+	[key: string]: CreateInManyLangs
+}
 
 export declare type CreateInManyLangs = {
 	ru: string

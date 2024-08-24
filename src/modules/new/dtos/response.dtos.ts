@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { PaginationResponseDto } from '../../../common'
-import { NewGetAllResponse, NewGetOneResponse } from '../interfaces'
+import { CreateInManyLangsDto, PaginationResponseDto } from '../../../common'
+import { NewGetAllForAdminResponse, NewGetAllResponse, NewGetOneForAdminResponse, NewGetOneResponse } from '../interfaces'
+import { CreateInManyLangs } from '../../../interfaces'
 
 export class NewGetOneResponseDto implements NewGetOneResponse {
 	@ApiProperty({ type: String })
@@ -18,6 +19,9 @@ export class NewGetOneResponseDto implements NewGetOneResponse {
 	@ApiProperty({ type: String })
 	description: string
 
+	@ApiProperty({ type: Boolean })
+	isTop: boolean
+
 	@ApiProperty({ type: Date, example: new Date() })
 	createdAt: Date
 }
@@ -25,4 +29,32 @@ export class NewGetOneResponseDto implements NewGetOneResponse {
 export class NewGetAllResponseDto extends PaginationResponseDto implements NewGetAllResponse {
 	@ApiProperty({ type: NewGetOneResponseDto, isArray: true })
 	data: NewGetOneResponse[]
+}
+
+export class NewGetOneForAdminResponseDto implements NewGetOneForAdminResponse {
+	@ApiProperty({ type: String })
+	id: string
+
+	@ApiProperty({ type: CreateInManyLangsDto })
+	name: CreateInManyLangs
+
+	@ApiProperty({ type: String })
+	authorId: string
+
+	@ApiProperty({ type: Number })
+	viewsCount: number
+
+	@ApiProperty({ type: CreateInManyLangsDto })
+	description: CreateInManyLangs
+
+	@ApiProperty({ type: Boolean })
+	isTop: boolean
+
+	@ApiProperty({ type: Date, example: new Date() })
+	createdAt: Date
+}
+
+export class NewGetAllForAdminResponseDto extends PaginationResponseDto implements NewGetAllForAdminResponse {
+	@ApiProperty({ type: NewGetOneForAdminResponseDto, isArray: true })
+	data: NewGetOneForAdminResponse[]
 }

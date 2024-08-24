@@ -1,8 +1,8 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import { CreateInManyLangsDto, PaginationRequestDto, UpdateInManyLangsDto } from '../../../common'
 import { CreateInManyLangs, UpdateInManyLangs } from '../../../interfaces'
-import { NewCreateRequest, NewDeleteRequest, NewGetAllRequest, NewGetOneByIdRequest, NewGetOneRequest, NewUpdateRequest } from '../interfaces'
-import { IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID, ValidateNested } from 'class-validator'
+import { NewCreateRequest, NewDeleteRequest, NewGetAllRequest, NewGetOneByIdRequest, NewGetOneRequest, NewUpdateManyCarousel, NewUpdateRequest } from '../interfaces'
+import { IsArray, IsBoolean, IsBooleanString, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID, ValidateNested } from 'class-validator'
 import { Type } from 'class-transformer'
 
 export class NewGetAllRequestDto extends PaginationRequestDto implements NewGetAllRequest {
@@ -25,6 +25,11 @@ export class NewGetAllRequestDto extends PaginationRequestDto implements NewGetA
 	@IsUUID('4')
 	@IsOptional()
 	categoryId?: string
+
+	@ApiPropertyOptional({ type: Boolean })
+	@IsBooleanString()
+	@IsOptional()
+	isTop?: boolean
 }
 
 export class NewGetOneByIdRequestDto implements NewGetOneByIdRequest {
@@ -64,6 +69,11 @@ export class NewGetOneRequestDto implements NewGetOneRequest {
 	@IsUUID('4')
 	@IsOptional()
 	categoryId?: string
+
+	@ApiPropertyOptional({ type: Boolean })
+	@IsBooleanString()
+	@IsOptional()
+	isTop?: boolean
 }
 
 export class NewCreateRequestDto implements NewCreateRequest {
@@ -88,6 +98,11 @@ export class NewCreateRequestDto implements NewCreateRequest {
 	@IsUUID('4')
 	@IsNotEmpty()
 	categoryId: string
+
+	@ApiPropertyOptional({ type: Boolean })
+	@IsBooleanString()
+	@IsOptional()
+	isTop?: boolean
 
 	@ApiProperty({ type: 'string', format: 'binary', isArray: true })
 	images?: any[]
@@ -127,8 +142,26 @@ export class NewUpdateRequestDto implements NewUpdateRequest {
 	@IsOptional()
 	imagesToDelete?: string[]
 
+	@ApiPropertyOptional({ type: Boolean })
+	@IsBooleanString()
+	@IsOptional()
+	isTop?: boolean
+
 	@ApiProperty({ type: 'string', format: 'binary', isArray: true })
 	images?: any[]
+}
+
+export class NewUpdateManyCarouselDto implements NewUpdateManyCarousel {
+	@ApiProperty({ type: String, isArray: true })
+	@IsArray()
+	@IsUUID('4', { each: true })
+	@IsNotEmpty()
+	ids: string[]
+
+	@ApiProperty({ type: Boolean })
+	@IsBoolean()
+	@IsNotEmpty()
+	isTop: boolean
 }
 
 export class NewDeleteRequestDto implements NewDeleteRequest {

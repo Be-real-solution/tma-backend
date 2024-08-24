@@ -1,6 +1,16 @@
 import { Injectable } from '@nestjs/common'
 import { PrismaService } from '../../prisma'
-import { NewCreateRequest, NewDeleteRequest, NewGetAllRequest, NewGetAllResponse, NewGetOneByIdRequest, NewGetOneRequest, NewGetOneResponse, NewUpdateRequest } from './interfaces'
+import {
+	NewCreateRequest,
+	NewDeleteRequest,
+	NewGetAllRequest,
+	NewGetAllResponse,
+	NewGetOneByIdRequest,
+	NewGetOneRequest,
+	NewGetOneResponse,
+	NewUpdateManyCarousel,
+	NewUpdateRequest,
+} from './interfaces'
 import { MutationResponse } from '../../interfaces'
 
 @Injectable()
@@ -26,8 +36,9 @@ export class NewRepo {
 				description: { contains: payload.description, mode: 'insensitive' },
 				authorId: payload.authorId,
 				categoryId: payload.categoryId,
+				isTop: payload.isTop,
 			},
-			select: { id: true, name: true, description: true, authorId: true, viewsCount: true, createdAt: true },
+			select: { id: true, name: true, description: true, authorId: true, viewsCount: true, isTop: true, createdAt: true },
 			...paginationOptions,
 			orderBy: [{ createdAt: 'desc' }],
 		})
@@ -40,6 +51,7 @@ export class NewRepo {
 					description: { contains: payload.description, mode: 'insensitive' },
 					authorId: payload.authorId,
 					categoryId: payload.categoryId,
+					isTop: payload.isTop,
 				},
 			})
 
@@ -56,7 +68,7 @@ export class NewRepo {
 	async getOneById(payload: NewGetOneByIdRequest): Promise<NewGetOneResponse> {
 		const neww = await this.prisma.new.findFirst({
 			where: { deletedAt: null, id: payload.id },
-			select: { id: true, name: true, description: true, authorId: true, viewsCount: true, createdAt: true },
+			select: { id: true, name: true, description: true, authorId: true, viewsCount: true, isTop: true, createdAt: true },
 		})
 
 		return neww
@@ -70,8 +82,9 @@ export class NewRepo {
 				description: payload.description,
 				authorId: payload.authorId,
 				categoryId: payload.categoryId,
+				isTop: payload.isTop,
 			},
-			select: { id: true, name: true, description: true, authorId: true, viewsCount: true, createdAt: true },
+			select: { id: true, name: true, description: true, authorId: true, viewsCount: true, isTop: true, createdAt: true },
 		})
 
 		return neww
@@ -84,6 +97,7 @@ export class NewRepo {
 				description: payload.description['en'] || Object.keys(payload.description)[0] || '',
 				categoryId: payload.categoryId,
 				authorId: payload.authorId,
+				isTop: payload.isTop,
 			},
 		})
 		return { id: neww.id }
@@ -98,9 +112,18 @@ export class NewRepo {
 				categoryId: payload.categoryId,
 				authorId: payload.authorId,
 				viewsCount: payload.viewsCount,
+				isTop: payload.isTop,
 			},
 		})
 		return { id: neww.id }
+	}
+
+	async updateManyCarousel(payload: NewUpdateManyCarousel): Promise<MutationResponse> {
+		await this.prisma.new.updateMany({
+			where: { deletedAt: null, id: { in: payload.ids } },
+			data: { isTop: payload.isTop },
+		})
+		return { id: payload.ids[0] }
 	}
 
 	async delete(payload: NewDeleteRequest): Promise<MutationResponse> {

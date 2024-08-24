@@ -1,12 +1,24 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
 import { NewRepo } from './new.repo'
-import { NewCreateRequest, NewDeleteRequest, NewGetAllRequest, NewGetAllResponse, NewGetOneByIdRequest, NewGetOneRequest, NewGetOneResponse, NewUpdateRequest } from './interfaces'
+import {
+	NewCreateRequest,
+	NewDeleteRequest,
+	NewGetAllForAdminResponse,
+	NewGetAllRequest,
+	NewGetAllResponse,
+	NewGetOneByIdRequest,
+	NewGetOneForAdminResponse,
+	NewGetOneRequest,
+	NewGetOneResponse,
+	NewUpdateManyCarousel,
+	NewUpdateRequest,
+} from './interfaces'
 import { MutationResponse } from '../../interfaces'
 import { NewImageService } from '../new-image'
 import { TranslationService } from '../translation'
 import { LanguageEnum } from '@prisma/client'
 import { TranslatedTableFields } from '../../common'
-import { TranslationArrayToObject } from '../../common/helpers/translation-array-to-object'
+import { TranslationArrayToObject, TranslationArrayToObject2 } from '../../common/helpers/translation-array-to-object'
 
 @Injectable()
 export class NewService {
@@ -60,6 +72,55 @@ export class NewService {
 					...n,
 					name: translatedObject[`${n.id}=${TranslatedTableFields.newName}`] || n.name,
 					description: translatedObject[`${n.id}=${TranslatedTableFields.newDescription}`] || n.description,
+				}
+			})
+		}
+		return {
+			data: mappedNews,
+			pagesCount: news.pagesCount,
+			pageSize: news.pageSize,
+		}
+	}
+
+	async getAllForAdmin(payload: NewGetAllRequest): Promise<NewGetAllForAdminResponse | NewGetOneForAdminResponse[]> {
+		const searchedData = await this.translationService.getAll({
+			text: [payload.name ?? '', payload.description ?? ''],
+			tableFields: [TranslatedTableFields.newName, TranslatedTableFields.newDescription],
+		})
+
+		const tableIds: string[] = []
+		for (const tr of searchedData) {
+			if (!tableIds.includes(tr.tableId)) {
+				tableIds.push(tr.tableId)
+			}
+		}
+
+		const news = await this.repo.getAll({ ...payload, ids: tableIds, name: undefined, description: undefined })
+
+		let mappedNews
+		const translations = await this.translationService.getAll({
+			tableFields: [TranslatedTableFields.newName, TranslatedTableFields.newDescription],
+			tableIds: Array.isArray(news) ? news.map((n) => n.id) : news.data.map((n) => n.id),
+		})
+
+		const translatedObject = await TranslationArrayToObject2(translations)
+
+		if (Array.isArray(news)) {
+			mappedNews = news.map((n) => {
+				return {
+					...n,
+					name: translatedObject[`${n.id}=${TranslatedTableFields.newName}`],
+					description: translatedObject[`${n.id}=${TranslatedTableFields.newDescription}`],
+				}
+			})
+
+			return mappedNews
+		} else {
+			mappedNews = news.data.map((n) => {
+				return {
+					...n,
+					name: translatedObject[`${n.id}=${TranslatedTableFields.newName}`],
+					description: translatedObject[`${n.id}=${TranslatedTableFields.newDescription}`],
 				}
 			})
 		}
@@ -126,6 +187,12 @@ export class NewService {
 		await this.createInManyLang(updatedNew.id, payload, 'update')
 
 		return updatedNew
+	}
+
+	async updateManyCarousel(payload: NewUpdateManyCarousel): Promise<MutationResponse> {
+		const neww = await this.repo.updateManyCarousel(payload)
+
+		return neww
 	}
 
 	async delete(payload: NewDeleteRequest): Promise<MutationResponse> {

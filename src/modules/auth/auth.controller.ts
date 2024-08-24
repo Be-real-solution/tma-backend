@@ -1,6 +1,6 @@
 import { Body, Controller, Post } from '@nestjs/common'
 import { AuthService } from './auth.service'
-import { ApiResponse } from '@nestjs/swagger'
+import { ApiResponse, ApiTags } from '@nestjs/swagger'
 import { AdminSignInRequestDto, AdminSignInResponseDto } from './dtos'
 import { AdminSignInResponse } from './interfaces'
 
@@ -11,6 +11,7 @@ export class AuthController {
 		this.service = service
 	}
 
+	@ApiTags('admin')
 	@Post('admin/sign-in')
 	@ApiResponse({ type: AdminSignInResponseDto })
 	create(@Body() payload: AdminSignInRequestDto): Promise<AdminSignInResponse> {

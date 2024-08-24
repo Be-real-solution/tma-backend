@@ -4,13 +4,15 @@ import { ApiBearerAuth, ApiConsumes, ApiResponse, ApiTags } from '@nestjs/swagge
 import {
 	BuildingCreateRequestDto,
 	BuildingDeleteRequestDto,
+	BuildingGetAllForAdminResponseDto,
 	BuildingGetAllRequestDto,
 	BuildingGetAllResponseDto,
 	BuildingGetOneByIdRequestDto,
+	BuildingGetOneForAdminResponseDto,
 	BuildingGetOneResponseDto,
 	BuildingUpdateRequestDto,
 } from './dtos'
-import { BuildingGetAllResponse, BuildingGetOneResponse } from './interfaces'
+import { BuildingGetAllForAdminResponse, BuildingGetAllResponse, BuildingGetOneForAdminResponse, BuildingGetOneResponse } from './interfaces'
 import { AuthGuard, LanguageDto, MutationResponseDto, PAGE_NUMBER, PAGE_SIZE, PAGINATION } from '../../common'
 import { MutationResponse } from '../../interfaces'
 import { FileInterceptor } from '@nestjs/platform-express'
@@ -38,6 +40,19 @@ export class BuildingController {
 			},
 			header['accept-language'],
 		)
+	}
+
+	@ApiTags('admin-panel')
+	@Get('for-admin')
+	@ApiResponse({ type: BuildingGetAllForAdminResponseDto })
+	@ApiResponse({ type: BuildingGetOneForAdminResponseDto, isArray: true })
+	getAllForAdmin(@Query() payload: BuildingGetAllRequestDto): Promise<BuildingGetAllForAdminResponse | BuildingGetOneForAdminResponse[]> {
+		return this.service.getAllForAdmin({
+			...payload,
+			pageNumber: payload.pageNumber ?? PAGE_NUMBER,
+			pageSize: payload.pageSize ?? PAGE_SIZE,
+			pagination: [true, 'true'].includes(payload.pagination) ? PAGINATION : false,
+		})
 	}
 
 	@Get(':id')

@@ -5,6 +5,7 @@ export declare interface NewGetAllRequest extends PaginationRequest {
 	description?: string
 	categoryId?: string
 	authorId?: string
+	isTop?: boolean
 }
 
 export declare interface NewGetOneByIdRequest {
@@ -18,6 +19,7 @@ export declare interface NewGetOneRequest {
 	authorId?: string
 	categoryId?: string
 	viewsCount?: number
+	isTop?: boolean
 }
 
 export declare interface NewCreateRequest {
@@ -25,6 +27,7 @@ export declare interface NewCreateRequest {
 	description: CreateInManyLangs
 	authorId: string
 	categoryId: string
+	isTop?: boolean
 	//=
 	images?: Array<Express.Multer.File>
 }
@@ -35,9 +38,15 @@ export declare interface NewUpdateRequest {
 	authorId?: string
 	viewsCount?: number
 	categoryId?: string
+	isTop?: boolean
 	//=
 	images?: Array<Express.Multer.File>
 	imagesToDelete?: string[]
+}
+
+export declare interface NewUpdateManyCarousel {
+	ids: string[]
+	isTop: boolean
 }
 
 export declare interface NewDeleteRequest {

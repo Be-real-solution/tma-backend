@@ -3,9 +3,11 @@ import { BuildingRepo } from './building.repo'
 import {
 	BuildingCreateRequest,
 	BuildingDeleteRequest,
+	BuildingGetAllForAdminResponse,
 	BuildingGetAllRequest,
 	BuildingGetAllResponse,
 	BuildingGetOneByIdRequest,
+	BuildingGetOneForAdminResponse,
 	BuildingGetOneRequest,
 	BuildingGetOneResponse,
 	BuildingUpdateRequest,
@@ -14,7 +16,7 @@ import { MutationResponse } from '../../interfaces'
 import { TranslationService } from '../translation'
 import { LanguageEnum } from '@prisma/client'
 import { TranslatedTableFields } from '../../common'
-import { TranslationArrayToObject } from '../../common/helpers/translation-array-to-object'
+import { TranslationArrayToObject, TranslationArrayToObject2 } from '../../common/helpers/translation-array-to-object'
 
 @Injectable()
 export class BuildingService {
@@ -66,6 +68,55 @@ export class BuildingService {
 					...b,
 					name: translatedObject[`${b.id}=${TranslatedTableFields.buildingName}`] || b.name,
 					address: translatedObject[`${b.id}=${TranslatedTableFields.buildingAddress}`] || b.address,
+				}
+			})
+		}
+		return {
+			data: mappedBuildings,
+			pagesCount: buildings.pagesCount,
+			pageSize: buildings.pageSize,
+		}
+	}
+
+	async getAllForAdmin(payload: BuildingGetAllRequest): Promise<BuildingGetAllForAdminResponse | BuildingGetOneForAdminResponse[]> {
+		const searchedData = await this.translationService.getAll({
+			text: [payload.name ?? '', payload.address ?? ''],
+			tableFields: [TranslatedTableFields.buildingName, TranslatedTableFields.buildingAddress],
+		})
+
+		const tableIds: string[] = []
+		for (const tr of searchedData) {
+			if (!tableIds.includes(tr.tableId)) {
+				tableIds.push(tr.tableId)
+			}
+		}
+
+		const buildings = await this.repo.getAll({ ...payload, ids: tableIds, name: undefined, address: undefined })
+
+		let mappedBuildings
+		const translations = await this.translationService.getAll({
+			tableFields: [TranslatedTableFields.buildingName, TranslatedTableFields.buildingAddress],
+			tableIds: Array.isArray(buildings) ? buildings.map((b) => b.id) : buildings.data.map((b) => b.id),
+		})
+
+		const translatedObject = await TranslationArrayToObject2(translations)
+
+		if (Array.isArray(buildings)) {
+			mappedBuildings = buildings.map((b) => {
+				return {
+					...b,
+					name: translatedObject[`${b.id}=${TranslatedTableFields.buildingName}`],
+					address: translatedObject[`${b.id}=${TranslatedTableFields.buildingAddress}`],
+				}
+			})
+
+			return mappedBuildings
+		} else {
+			mappedBuildings = buildings.data.map((b) => {
+				return {
+					...b,
+					name: translatedObject[`${b.id}=${TranslatedTableFields.buildingName}`],
+					address: translatedObject[`${b.id}=${TranslatedTableFields.buildingAddress}`],
 				}
 			})
 		}
