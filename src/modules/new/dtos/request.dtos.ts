@@ -2,7 +2,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import { CreateInManyLangsDto, PaginationRequestDto, UpdateInManyLangsDto } from '../../../common'
 import { CreateInManyLangs, UpdateInManyLangs } from '../../../interfaces'
 import { NewCreateRequest, NewDeleteRequest, NewGetAllRequest, NewGetOneByIdRequest, NewGetOneRequest, NewUpdateManyCarousel, NewUpdateRequest } from '../interfaces'
-import { IsArray, IsBoolean, IsBooleanString, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID, ValidateNested } from 'class-validator'
+import { IsArray, IsBoolean, IsBooleanString, IsDateString, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID, ValidateNested } from 'class-validator'
 import { Type } from 'class-transformer'
 
 export class NewGetAllRequestDto extends PaginationRequestDto implements NewGetAllRequest {
@@ -30,6 +30,16 @@ export class NewGetAllRequestDto extends PaginationRequestDto implements NewGetA
 	@IsBooleanString()
 	@IsOptional()
 	isTop?: boolean
+
+	@ApiPropertyOptional({ type: Date, example: new Date() })
+	@IsDateString()
+	@IsOptional()
+	startDate?: Date
+
+	@ApiPropertyOptional({ type: Date, example: new Date() })
+	@IsDateString()
+	@IsOptional()
+	endDate?: Date
 }
 
 export class NewGetOneByIdRequestDto implements NewGetOneByIdRequest {
@@ -143,7 +153,7 @@ export class NewUpdateRequestDto implements NewUpdateRequest {
 	imagesToDelete?: string[]
 
 	@ApiPropertyOptional({ type: Boolean })
-	@IsBooleanString()
+	@IsBoolean()
 	@IsOptional()
 	isTop?: boolean
 

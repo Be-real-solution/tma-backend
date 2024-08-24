@@ -83,18 +83,18 @@ export class NewController {
 		return this.service.create({ ...payload, images: images })
 	}
 
+	@Patch('many-carousel')
+	@ApiResponse({ type: MutationResponseDto })
+	updateManyCarousel(@Body() payload: NewUpdateManyCarouselDto): Promise<MutationResponse> {
+		return this.service.updateManyCarousel(payload)
+	}
+
 	@Patch(':id')
 	@ApiConsumes('multipart/form-data')
 	@UseInterceptors(FilesInterceptor('images'))
 	@ApiResponse({ type: MutationResponseDto })
 	update(@Param() param: NewGetOneByIdRequestDto, @Body() payload: NewUpdateRequestDto, @UploadedFiles() images: Array<Express.Multer.File>): Promise<MutationResponse> {
 		return this.service.update(param, { ...payload, images: images })
-	}
-
-	@Patch(':id')
-	@ApiResponse({ type: MutationResponseDto })
-	updateManyCarousel(@Body() payload: NewUpdateManyCarouselDto): Promise<MutationResponse> {
-		return this.service.updateManyCarousel(payload)
 	}
 
 	@Delete(':id')

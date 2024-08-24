@@ -6,6 +6,8 @@ export declare interface NewGetAllRequest extends PaginationRequest {
 	categoryId?: string
 	authorId?: string
 	isTop?: boolean
+	startDate?: Date
+	endDate?: Date
 }
 
 export declare interface NewGetOneByIdRequest {

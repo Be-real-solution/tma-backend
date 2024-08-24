@@ -12,6 +12,7 @@ import {
 	NewUpdateRequest,
 } from './interfaces'
 import { MutationResponse } from '../../interfaces'
+import { nextDay, setHoursTo0 } from '../../common/helpers'
 
 @Injectable()
 export class NewRepo {
@@ -21,6 +22,20 @@ export class NewRepo {
 	}
 
 	async getAll(payload: NewGetAllRequest & { ids?: string[] }): Promise<NewGetAllResponse | NewGetOneResponse[]> {
+		let dateOptions = {}
+
+		if (payload.startDate && payload.endDate) {
+			dateOptions = {
+				lte: setHoursTo0(payload.endDate),
+				gte: setHoursTo0(payload.startDate),
+			}
+		} else if (payload.startDate) {
+			dateOptions = {
+				lte: nextDay(payload.startDate),
+				gte: setHoursTo0(payload.startDate),
+			}
+		}
+
 		let paginationOptions = {}
 		if (payload.pagination) {
 			paginationOptions = {
@@ -37,6 +52,7 @@ export class NewRepo {
 				authorId: payload.authorId,
 				categoryId: payload.categoryId,
 				isTop: payload.isTop,
+				createdAt: { ...dateOptions },
 			},
 			select: { id: true, name: true, description: true, authorId: true, viewsCount: true, isTop: true, createdAt: true },
 			...paginationOptions,
@@ -52,6 +68,7 @@ export class NewRepo {
 					authorId: payload.authorId,
 					categoryId: payload.categoryId,
 					isTop: payload.isTop,
+					createdAt: { ...dateOptions },
 				},
 			})
 
