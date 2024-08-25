@@ -54,7 +54,10 @@ export class BuildingCreateRequestDto implements BuildingCreateRequest {
 	address: CreateInManyLangs
 
 	@ApiProperty({ type: 'string', format: 'binary' })
-	image?: any
+	image: any
+
+	@ApiProperty({ type: 'string', format: 'binary', isArray: true })
+	images?: any[]
 
 	@ApiProperty({ type: String })
 	@IsPhoneNumber('UZ')
@@ -98,6 +101,9 @@ export class BuildingUpdateRequestDto implements BuildingUpdateRequest {
 	@ApiPropertyOptional({ type: 'string', format: 'binary' })
 	image?: any
 
+	@ApiPropertyOptional({ type: 'string', format: 'binary', isArray: true })
+	images?: any[]
+
 	@ApiPropertyOptional({ type: String })
 	@IsPhoneNumber('UZ')
 	@IsOptional()
@@ -122,6 +128,12 @@ export class BuildingUpdateRequestDto implements BuildingUpdateRequest {
 	@IsLongitude()
 	@IsOptional()
 	longitude?: string
+
+	@ApiPropertyOptional({ type: String, isArray: true })
+	@ValidateNested({ each: true })
+	@IsUUID('4')
+	@IsOptional()
+	imagesToDelete?: string[]
 }
 
 export class BuildingDeleteRequestDto implements BuildingDeleteRequest {

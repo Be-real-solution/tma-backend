@@ -1,5 +1,5 @@
 import { AdminGetAllResponseDto, AdminGetOneResponseDto } from './dtos/response.dtos'
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common'
+import { Body, Controller, Delete, Get, Headers, Param, Patch, Post, Query, UseGuards } from '@nestjs/common'
 import { AdminService } from './admin.service'
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { AuthGuard, MutationResponseDto, PAGE_NUMBER, PAGE_SIZE, PAGINATION } from '../../common'
@@ -8,7 +8,6 @@ import { AdminGetAllResponse, AdminGetOneResponse } from './interfaces'
 import { MutationResponse } from '../../interfaces'
 
 @ApiTags('admin')
-@UseGuards(AuthGuard)
 @ApiBearerAuth()
 @Controller('admin')
 export class AdminController {
@@ -17,6 +16,7 @@ export class AdminController {
 		this.service = service
 	}
 
+	@UseGuards(AuthGuard)
 	@Get()
 	@ApiResponse({ type: AdminGetAllResponseDto })
 	@ApiResponse({ type: AdminGetOneResponseDto, isArray: true })
@@ -29,6 +29,7 @@ export class AdminController {
 		})
 	}
 
+	@UseGuards(AuthGuard)
 	@Get(':id')
 	@ApiResponse({ type: AdminGetOneResponseDto })
 	getOneById(@Param() payload: AdminGetOneByIdRequestDto): Promise<AdminGetOneResponse> {
@@ -37,16 +38,18 @@ export class AdminController {
 
 	@Post()
 	@ApiResponse({ type: MutationResponseDto })
-	create(@Body() payload: AdminCreateRequestDto): Promise<MutationResponse> {
-		return this.service.create(payload)
+	create(@Body() payload: AdminCreateRequestDto, @Headers() headers: { authorization?: string }): Promise<MutationResponse> {
+		return this.service.create(payload, headers.authorization)
 	}
 
+	@UseGuards(AuthGuard)
 	@Patch(':id')
 	@ApiResponse({ type: MutationResponseDto })
 	update(@Param() param: AdminGetOneByIdRequestDto, @Body() payload: AdminUpdateRequestDto): Promise<MutationResponse> {
 		return this.service.update(param, payload)
 	}
 
+	@UseGuards(AuthGuard)
 	@Delete(':id')
 	@ApiResponse({ type: MutationResponseDto })
 	delete(@Param() param: AdminDeleteRequestDto): Promise<MutationResponse> {

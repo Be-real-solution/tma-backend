@@ -17,13 +17,16 @@ import { TranslationService } from '../translation'
 import { LanguageEnum } from '@prisma/client'
 import { TranslatedTableFields } from '../../common'
 import { TranslationArrayToObject, TranslationArrayToObject2 } from '../../common/helpers/translation-array-to-object'
+import { BuildingImageService } from '../building-image'
 
 @Injectable()
 export class BuildingService {
 	private readonly repo: BuildingRepo
+	private readonly buildingImageService: BuildingImageService
 	private readonly translationService: TranslationService
-	constructor(repo: BuildingRepo, translationService: TranslationService) {
+	constructor(repo: BuildingRepo, translationService: TranslationService, buildingImageService: BuildingImageService) {
 		this.repo = repo
+		this.buildingImageService = buildingImageService
 		this.translationService = translationService
 	}
 
@@ -166,16 +169,10 @@ export class BuildingService {
 			throw new BadRequestException('building name already exists')
 		}
 
-		const existsInTr2 = await this.translationService.getAll2({
-			text: [payload.address.uz, payload.address.ru, payload.address.en],
-			tableFields: [TranslatedTableFields.buildingAddress],
-		})
-		if (existsInTr2.length) {
-			throw new BadRequestException('building address already exists')
-		}
-
 		const building = await this.repo.create(payload)
+		payload.images.length ? await this.buildingImageService.createMany({ datas: payload.images.map((i) => ({ buildingId: building.id, imageLink: i.filename })) }) : null
 		await this.createInManyLang(building.id, payload, 'create')
+
 		return building
 	}
 
@@ -187,11 +184,18 @@ export class BuildingService {
 		await this.checkUpdateFields(param, payload)
 
 		const building = await this.repo.update({ ...param, ...payload })
+		payload.imagesToDelete?.length ? await this.buildingImageService.deleteMany({ ids: payload.imagesToDelete }) : null
+		payload.images?.length ? await this.buildingImageService.createMany({ datas: payload.images.map((i) => ({ buildingId: building.id, imageLink: i.filename })) }) : null
 		await this.createInManyLang(building.id, payload, 'update')
+
 		return building
 	}
 
 	async delete(payload: BuildingDeleteRequest): Promise<MutationResponse> {
+		const ca = await this.getOne(payload)
+		if (!ca) {
+			throw new BadRequestException('building not found')
+		}
 		const building = await this.repo.delete(payload)
 		await this.translationService.deleteMany({ tableId: building.id })
 		return building

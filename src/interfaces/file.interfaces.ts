@@ -4,3 +4,8 @@ export declare interface UploadedTxtFile {
 	mimetype: string
 	size: number
 }
+
+export declare interface CustomUploadedFiles {
+	image?: Express.Multer.File[]
+	images?: Express.Multer.File[]
+}

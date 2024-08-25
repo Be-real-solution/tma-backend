@@ -6,7 +6,6 @@ export function TranslationArrayToObject(translations: TranslationGetOneResponse
 	for (const translation of translations) {
 		customObj[`${translation.tableId}=${translation.tableField}`] = translation.text
 	}
-	console.log(customObj)
 	return customObj
 }
 
@@ -20,6 +19,5 @@ export function TranslationArrayToObject2(translations: TranslationGetOneRespons
 
 		customObj[key][translation.language] = translation.text
 	}
-	console.log(customObj)
 	return customObj
 }

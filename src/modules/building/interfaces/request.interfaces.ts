@@ -32,6 +32,8 @@ export declare interface BuildingCreateRequest {
 	workEndTime: string
 	workStartTime: string
 	image?: string
+	//=
+	images?: Array<Express.Multer.File>
 }
 
 export declare interface BuildingUpdateRequest {
@@ -43,6 +45,9 @@ export declare interface BuildingUpdateRequest {
 	workEndTime?: string
 	workStartTime?: string
 	image?: string
+	//=
+	imagesToDelete?: string[]
+	images?: Array<Express.Multer.File>
 }
 
 export declare interface BuildingDeleteRequest {

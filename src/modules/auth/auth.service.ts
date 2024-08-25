@@ -24,7 +24,7 @@ export class AuthService {
 		if (!isCorrect) {
 			throw new UnauthorizedException('admin not found')
 		}
-
+		delete admin.password
 		const tokens = await this.getTokens({ id: admin.id })
 		return { admin: admin, tokens: tokens }
 	}

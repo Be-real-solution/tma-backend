@@ -41,16 +41,21 @@ export class BuildingRepo {
 				id: true,
 				name: true,
 				address: true,
-				imageLink: true,
+				mainImage: true,
 				phoneNumber: true,
 				workEndTime: true,
 				workStartTime: true,
 				latitude: true,
 				longitude: true,
 				createdAt: true,
+				images: { select: { imageLink: true } },
 			},
 			...paginationOptions,
 			orderBy: [{ createdAt: 'desc' }],
+		})
+
+		const mappedBuildings = buildings.map((b) => {
+			return { ...b, images: b?.images.map((i) => i.imageLink) }
 		})
 
 		if (payload.pagination) {
@@ -68,10 +73,10 @@ export class BuildingRepo {
 			return {
 				pagesCount: Math.ceil(buildingsCount / payload.pageSize),
 				pageSize: buildings.length,
-				data: buildings,
+				data: mappedBuildings,
 			}
 		} else {
-			return buildings
+			return mappedBuildings
 		}
 	}
 
@@ -82,26 +87,27 @@ export class BuildingRepo {
 				id: true,
 				name: true,
 				address: true,
-				imageLink: true,
+				mainImage: true,
 				phoneNumber: true,
 				workEndTime: true,
 				workStartTime: true,
 				latitude: true,
 				longitude: true,
 				createdAt: true,
+				images: { select: { imageLink: true } },
 			},
 		})
 
-		return building
+		return building ? { ...building, images: building?.images.map((i) => i.imageLink) } : null
 	}
 
 	async getOne(payload: BuildingGetOneRequest): Promise<BuildingGetOneResponse> {
 		const building = await this.prisma.building.findFirst({
 			where: {
 				deletedAt: null,
-				name: { contains: payload.name, mode: 'insensitive' },
-				address: { contains: payload.address, mode: 'insensitive' },
-				phoneNumber: { contains: payload.phoneNumber, mode: 'insensitive' },
+				name: payload.name,
+				address: payload.address,
+				phoneNumber: payload.phoneNumber,
 				workEndTime: payload.workEndTime,
 				workStartTime: payload.workStartTime,
 				latitude: payload.latutude,
@@ -111,17 +117,17 @@ export class BuildingRepo {
 				id: true,
 				name: true,
 				address: true,
-				imageLink: true,
+				mainImage: true,
 				phoneNumber: true,
 				workEndTime: true,
 				workStartTime: true,
 				latitude: true,
 				longitude: true,
 				createdAt: true,
+				images: { select: { imageLink: true } },
 			},
 		})
-
-		return building
+		return building ? { ...building, images: building?.images.map((i) => i.imageLink) } : null
 	}
 
 	async getOneWithOr(payload: BuildingGetOneRequest): Promise<BuildingGetOneResponse> {
@@ -131,17 +137,18 @@ export class BuildingRepo {
 				id: true,
 				name: true,
 				address: true,
-				imageLink: true,
+				mainImage: true,
 				phoneNumber: true,
 				workEndTime: true,
 				workStartTime: true,
 				latitude: true,
 				longitude: true,
 				createdAt: true,
+				images: { select: { imageLink: true } },
 			},
 		})
 
-		return building
+		return building ? { ...building, images: building?.images.map((i) => i.imageLink) } : null
 	}
 
 	async create(payload: BuildingCreateRequest): Promise<MutationResponse> {
@@ -154,7 +161,7 @@ export class BuildingRepo {
 				workStartTime: payload.workStartTime,
 				latitude: payload.latitude,
 				longitude: payload.longitude,
-				imageLink: payload.image,
+				mainImage: payload.image,
 			},
 		})
 		return { id: building.id }
@@ -166,12 +173,12 @@ export class BuildingRepo {
 			data: {
 				name: payload.name?.en ?? undefined,
 				address: payload.address?.en ?? undefined,
-				imageLink: payload.image,
 				phoneNumber: payload.phoneNumber,
 				workEndTime: payload.workEndTime,
 				workStartTime: payload.workStartTime,
 				latitude: payload.latitude,
 				longitude: payload.longitude,
+				mainImage: payload.image,
 			},
 		})
 		return { id: building.id }

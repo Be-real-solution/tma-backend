@@ -15,7 +15,10 @@ export class BuildingGetOneResponseDto implements BuildingGetOneResponse {
 	address: string
 
 	@ApiProperty({ type: String })
-	imageLink: string
+	mainImage: string
+
+	@ApiProperty({ type: String, isArray: true })
+	images: string[]
 
 	@ApiProperty({ type: String })
 	phoneNumber: string
@@ -51,7 +54,10 @@ export class BuildingGetOneForAdminResponseDto implements BuildingGetOneForAdmin
 	address: CreateInManyLangs
 
 	@ApiProperty({ type: String })
-	imageLink: string
+	mainImage: string
+
+	@ApiProperty({ type: String, isArray: true })
+	images: string[]
 
 	@ApiProperty({ type: String })
 	phoneNumber: string

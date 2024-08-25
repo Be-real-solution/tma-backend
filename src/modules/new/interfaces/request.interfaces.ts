@@ -4,7 +4,7 @@ export declare interface NewGetAllRequest extends PaginationRequest {
 	name?: string
 	description?: string
 	categoryId?: string
-	authorId?: string
+	adminId?: string
 	isTop?: boolean
 	startDate?: Date
 	endDate?: Date
@@ -18,7 +18,7 @@ export declare interface NewGetOneRequest {
 	id?: string
 	name?: string
 	description?: string
-	authorId?: string
+	adminId?: string
 	categoryId?: string
 	viewsCount?: number
 	isTop?: boolean
@@ -27,21 +27,23 @@ export declare interface NewGetOneRequest {
 export declare interface NewCreateRequest {
 	name: CreateInManyLangs
 	description: CreateInManyLangs
-	authorId: string
+	adminId: string
 	categoryId: string
 	isTop?: boolean
 	//=
+	image?: string
 	images?: Array<Express.Multer.File>
 }
 
 export declare interface NewUpdateRequest {
 	name?: UpdateInManyLangs
 	description?: UpdateInManyLangs
-	authorId?: string
+	adminId?: string
 	viewsCount?: number
 	categoryId?: string
 	isTop?: boolean
 	//=
+	image?: string
 	images?: Array<Express.Multer.File>
 	imagesToDelete?: string[]
 }

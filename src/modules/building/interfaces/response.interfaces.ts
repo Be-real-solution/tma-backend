@@ -11,7 +11,8 @@ export declare interface BuildingGetOneResponse {
 	phoneNumber: string
 	workStartTime: string
 	workEndTime: string
-	imageLink: string
+	mainImage: string
+	images: string[]
 	createdAt: Date
 }
 
@@ -26,6 +27,7 @@ export declare interface BuildingGetOneForAdminResponse {
 	phoneNumber: string
 	workStartTime: string
 	workEndTime: string
-	imageLink: string
+	mainImage: string
+	images: string[]
 	createdAt: Date
 }

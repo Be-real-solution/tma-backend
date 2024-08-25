@@ -11,7 +11,7 @@ export class NewGetOneResponseDto implements NewGetOneResponse {
 	name: string
 
 	@ApiProperty({ type: String })
-	authorId: string
+	adminId: string
 
 	@ApiProperty({ type: Number })
 	viewsCount: number
@@ -24,6 +24,12 @@ export class NewGetOneResponseDto implements NewGetOneResponse {
 
 	@ApiProperty({ type: Date, example: new Date() })
 	createdAt: Date
+
+	@ApiProperty({ type: String })
+	mainImage: string
+
+	@ApiProperty({ type: String, isArray: true })
+	images: string[]
 }
 
 export class NewGetAllResponseDto extends PaginationResponseDto implements NewGetAllResponse {
@@ -39,7 +45,7 @@ export class NewGetOneForAdminResponseDto implements NewGetOneForAdminResponse {
 	name: CreateInManyLangs
 
 	@ApiProperty({ type: String })
-	authorId: string
+	adminId: string
 
 	@ApiProperty({ type: Number })
 	viewsCount: number
@@ -52,6 +58,12 @@ export class NewGetOneForAdminResponseDto implements NewGetOneForAdminResponse {
 
 	@ApiProperty({ type: Date, example: new Date() })
 	createdAt: Date
+
+	@ApiProperty({ type: String })
+	mainImage: string
+
+	@ApiProperty({ type: String, isArray: true })
+	images: string[]
 }
 
 export class NewGetAllForAdminResponseDto extends PaginationResponseDto implements NewGetAllForAdminResponse {

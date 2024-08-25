@@ -144,6 +144,7 @@ export class NewService {
 		})
 
 		const translatedObject = await TranslationArrayToObject(translations)
+		await this.update({ id: neww.id }, { viewsCount: neww.viewsCount + 1 })
 
 		return {
 			...neww,
@@ -168,7 +169,7 @@ export class NewService {
 		}
 
 		const neww = await this.repo.create(payload)
-		await this.newImageService.createMany({ datas: payload.images.map((i) => ({ newId: neww.id, imageLink: i.filename })) })
+		payload?.images?.length ? await this.newImageService.createMany({ datas: payload.images.map((i) => ({ newId: neww.id, imageLink: i.filename })) }) : null
 		await this.createInManyLang(neww.id, payload, 'create')
 
 		return neww
@@ -182,8 +183,8 @@ export class NewService {
 		await this.checkUpdateFields(param, payload)
 
 		const updatedNew = await this.repo.update({ ...param, ...payload })
-		await this.newImageService.deleteMany({ ids: payload.imagesToDelete })
-		await this.newImageService.createMany({ datas: payload.images.map((i) => ({ newId: updatedNew.id, imageLink: i.filename })) })
+		payload?.imagesToDelete?.length ? await this.newImageService.deleteMany({ ids: payload.imagesToDelete }) : null
+		payload?.images?.length ? await this.newImageService.createMany({ datas: payload.images.map((i) => ({ newId: updatedNew.id, imageLink: i.filename })) }) : null
 		await this.createInManyLang(updatedNew.id, payload, 'update')
 
 		return updatedNew
@@ -196,7 +197,14 @@ export class NewService {
 	}
 
 	async delete(payload: NewDeleteRequest): Promise<MutationResponse> {
-		return this.repo.delete(payload)
+		const ca = await this.getOne(payload)
+		if (!ca) {
+			throw new BadRequestException('new not found')
+		}
+		const neww = await this.repo.delete(payload)
+		await this.translationService.deleteMany({ tableId: neww.id })
+
+		return neww
 	}
 
 	private async checkUpdateFields(param: NewGetOneByIdRequest, payload: NewUpdateRequest): Promise<void> {
@@ -207,7 +215,7 @@ export class NewService {
 				tableFields: [TranslatedTableFields.newName],
 			})
 			c1.forEach((c) => {
-				if (c && c.id !== param.id && c.tableField === TranslatedTableFields.newName) {
+				if (c && c.tableId !== param.id && c.tableField === TranslatedTableFields.newName) {
 					throw new BadRequestException('this name already exists')
 				}
 			})

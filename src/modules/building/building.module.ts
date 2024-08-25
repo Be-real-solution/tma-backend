@@ -6,8 +6,10 @@ import { TranslationModule } from '../translation'
 import { MulterModule } from '@nestjs/platform-express'
 import * as multer from 'multer'
 import { extname } from 'path'
+import { BuildingImageModule } from '../building-image'
 @Module({
 	imports: [
+		BuildingImageModule,
 		TranslationModule,
 		MulterModule.register({
 			storage: multer.diskStorage({

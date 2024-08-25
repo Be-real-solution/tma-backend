@@ -14,7 +14,7 @@ export class NewGetAllRequestDto extends PaginationRequestDto implements NewGetA
 	@ApiPropertyOptional({ type: String })
 	@IsUUID('4')
 	@IsOptional()
-	authorId?: string
+	adminId?: string
 
 	@ApiPropertyOptional({ type: String })
 	@IsString()
@@ -63,7 +63,7 @@ export class NewGetOneRequestDto implements NewGetOneRequest {
 	@ApiPropertyOptional({ type: String })
 	@IsUUID('4')
 	@IsOptional()
-	authorId?: string
+	adminId?: string
 
 	@ApiPropertyOptional({ type: Number })
 	@IsNumber()
@@ -96,7 +96,7 @@ export class NewCreateRequestDto implements NewCreateRequest {
 	@ApiProperty({ type: String })
 	@IsUUID('4')
 	@IsNotEmpty()
-	authorId: string
+	adminId: string
 
 	@ApiProperty({ type: CreateInManyLangsDto })
 	@ValidateNested()
@@ -114,8 +114,11 @@ export class NewCreateRequestDto implements NewCreateRequest {
 	@IsOptional()
 	isTop?: boolean
 
-	@ApiProperty({ type: 'string', format: 'binary', isArray: true })
+	@ApiPropertyOptional({ type: 'string', format: 'binary', isArray: true })
 	images?: any[]
+
+	@ApiProperty({ type: 'string', format: 'binary' })
+	image: any
 }
 
 export class NewUpdateRequestDto implements NewUpdateRequest {
@@ -134,7 +137,7 @@ export class NewUpdateRequestDto implements NewUpdateRequest {
 	@ApiPropertyOptional({ type: String })
 	@IsUUID('4')
 	@IsOptional()
-	authorId?: string
+	adminId?: string
 
 	@ApiPropertyOptional({ type: Number })
 	@IsNumber()
@@ -157,8 +160,11 @@ export class NewUpdateRequestDto implements NewUpdateRequest {
 	@IsOptional()
 	isTop?: boolean
 
-	@ApiProperty({ type: 'string', format: 'binary', isArray: true })
+	@ApiPropertyOptional({ type: 'string', format: 'binary', isArray: true })
 	images?: any[]
+
+	@ApiPropertyOptional({ type: 'string', format: 'binary' })
+	image?: any
 }
 
 export class NewUpdateManyCarouselDto implements NewUpdateManyCarousel {

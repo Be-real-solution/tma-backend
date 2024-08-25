@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { BadRequestException, Injectable } from '@nestjs/common'
 import { PrismaService } from '../../prisma'
 import {
 	NewCreateRequest,
@@ -49,14 +49,28 @@ export class NewRepo {
 				deletedAt: null,
 				name: { contains: payload.name, mode: 'insensitive' },
 				description: { contains: payload.description, mode: 'insensitive' },
-				authorId: payload.authorId,
+				adminId: payload.adminId,
 				categoryId: payload.categoryId,
 				isTop: payload.isTop,
 				createdAt: { ...dateOptions },
 			},
-			select: { id: true, name: true, description: true, authorId: true, viewsCount: true, isTop: true, createdAt: true },
+			select: {
+				id: true,
+				name: true,
+				description: true,
+				adminId: true,
+				viewsCount: true,
+				isTop: true,
+				mainImage: true,
+				images: { select: { imageLink: true } },
+				createdAt: true,
+			},
 			...paginationOptions,
 			orderBy: [{ createdAt: 'desc' }],
+		})
+
+		const mappedNews = news.map((n) => {
+			return { ...n, images: n?.images.map((i) => i.imageLink) }
 		})
 
 		if (payload.pagination) {
@@ -65,7 +79,7 @@ export class NewRepo {
 					deletedAt: null,
 					name: { contains: payload.name, mode: 'insensitive' },
 					description: { contains: payload.description, mode: 'insensitive' },
-					authorId: payload.authorId,
+					adminId: payload.adminId,
 					categoryId: payload.categoryId,
 					isTop: payload.isTop,
 					createdAt: { ...dateOptions },
@@ -75,20 +89,30 @@ export class NewRepo {
 			return {
 				pagesCount: Math.ceil(newsCount / payload.pageSize),
 				pageSize: news.length,
-				data: news,
+				data: mappedNews,
 			}
 		} else {
-			return news
+			return mappedNews
 		}
 	}
 
 	async getOneById(payload: NewGetOneByIdRequest): Promise<NewGetOneResponse> {
 		const neww = await this.prisma.new.findFirst({
 			where: { deletedAt: null, id: payload.id },
-			select: { id: true, name: true, description: true, authorId: true, viewsCount: true, isTop: true, createdAt: true },
+			select: {
+				id: true,
+				name: true,
+				description: true,
+				adminId: true,
+				viewsCount: true,
+				isTop: true,
+				createdAt: true,
+				mainImage: true,
+				images: { select: { imageLink: true } },
+			},
 		})
 
-		return neww
+		return neww ? { ...neww, images: neww?.images.map((i) => i.imageLink) } : null
 	}
 
 	async getOne(payload: NewGetOneRequest): Promise<NewGetOneResponse> {
@@ -97,39 +121,74 @@ export class NewRepo {
 				deletedAt: null,
 				name: payload.name,
 				description: payload.description,
-				authorId: payload.authorId,
+				adminId: payload.adminId,
 				categoryId: payload.categoryId,
 				isTop: payload.isTop,
 			},
-			select: { id: true, name: true, description: true, authorId: true, viewsCount: true, isTop: true, createdAt: true },
+			select: {
+				id: true,
+				name: true,
+				description: true,
+				adminId: true,
+				viewsCount: true,
+				isTop: true,
+				createdAt: true,
+				mainImage: true,
+				images: { select: { imageLink: true } },
+			},
 		})
 
-		return neww
+		return neww ? { ...neww, images: neww?.images.map((i) => i.imageLink) } : null
 	}
 
 	async create(payload: NewCreateRequest): Promise<MutationResponse> {
+		const admin = await this.prisma.admin.findFirst({ where: { deletedAt: null, id: payload.adminId } })
+		if (!admin) {
+			throw new BadRequestException('admin not found')
+		}
+
+		const category = await this.prisma.category.findFirst({ where: { deletedAt: null, id: payload.categoryId } })
+		if (!category) {
+			throw new BadRequestException('category not found')
+		}
+
 		const neww = await this.prisma.new.create({
 			data: {
 				name: payload.name['en'] || Object.keys(payload.name)[0] || '',
 				description: payload.description['en'] || Object.keys(payload.description)[0] || '',
 				categoryId: payload.categoryId,
-				authorId: payload.authorId,
+				adminId: payload.adminId,
 				isTop: payload.isTop,
+				mainImage: payload.image,
 			},
 		})
 		return { id: neww.id }
 	}
 
 	async update(payload: NewUpdateRequest & NewGetOneByIdRequest): Promise<MutationResponse> {
+		if (payload.adminId) {
+			const admin = await this.prisma.admin.findFirst({ where: { deletedAt: null, id: payload.adminId } })
+			if (!admin) {
+				throw new BadRequestException('admin not found')
+			}
+		}
+		if (payload.categoryId) {
+			const category = await this.prisma.category.findFirst({ where: { deletedAt: null, id: payload.categoryId } })
+			if (!category) {
+				throw new BadRequestException('category not found')
+			}
+		}
+
 		const neww = await this.prisma.new.update({
 			where: { deletedAt: null, id: payload.id },
 			data: {
 				name: payload.name?.en ?? undefined,
 				description: payload.description?.en ?? undefined,
 				categoryId: payload.categoryId,
-				authorId: payload.authorId,
+				adminId: payload.adminId,
 				viewsCount: payload.viewsCount,
 				isTop: payload.isTop,
+				mainImage: payload.image,
 			},
 		})
 		return { id: neww.id }

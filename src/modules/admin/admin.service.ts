@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common'
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common'
 import { AdminRepo } from './admin.repo'
 import * as bcrypt from 'bcrypt'
 import {
@@ -12,12 +12,16 @@ import {
 	AdminUpdateRequest,
 } from './interfaces'
 import { MutationResponse } from '../../interfaces'
+import { JwtService } from '@nestjs/jwt'
+import { JwtConfig } from '../../configs'
 
 @Injectable()
 export class AdminService {
 	private readonly repo: AdminRepo
-	constructor(repo: AdminRepo) {
+	private readonly jwtService: JwtService
+	constructor(repo: AdminRepo, jwtService: JwtService) {
 		this.repo = repo
+		this.jwtService = jwtService
 	}
 
 	async getAll(payload: AdminGetAllRequest): Promise<AdminGetAllResponse | AdminGetOneResponse[]> {
@@ -38,7 +42,27 @@ export class AdminService {
 		return admin
 	}
 
-	async create(payload: AdminCreateRequest): Promise<MutationResponse> {
+	async create(payload: AdminCreateRequest, authorization: string): Promise<MutationResponse> {
+		const admins = await this.getAll({ pagination: false })
+		if (Array.isArray(admins)) {
+			if (admins.length) {
+				if (!authorization) {
+					throw new UnauthorizedException('authorization not provided')
+				}
+				const token = authorization.split(' ')[1] || ''
+				if (!token) {
+					throw new UnauthorizedException('token not provided')
+				}
+				try {
+					const payload = await this.jwtService.verifyAsync(token, { secret: JwtConfig.accessToken.key })
+					if (!payload?.id) {
+						throw new UnauthorizedException('invalid token')
+					}
+				} catch (e) {
+					throw new UnauthorizedException(e)
+				}
+			}
+		}
 		const candidate = await this.getOne({ username: payload.username })
 		if (candidate) {
 			throw new BadRequestException('username already exists')
@@ -65,6 +89,10 @@ export class AdminService {
 	}
 
 	async delete(payload: AdminDeleteRequest): Promise<MutationResponse> {
+		const ca = await this.getOne(payload)
+		if (!ca) {
+			throw new BadRequestException('admin not found')
+		}
 		return this.repo.delete(payload)
 	}
 }

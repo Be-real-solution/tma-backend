@@ -8,8 +8,6 @@ import { CategoryGetAllResponse, CategoryGetOneResponse } from './interfaces'
 import { MutationResponse } from '../../interfaces'
 
 @ApiTags('category')
-@UseGuards(AuthGuard)
-@ApiBearerAuth()
 @Controller('category')
 export class CategoryController {
 	private readonly service: CategoryService
@@ -35,18 +33,24 @@ export class CategoryController {
 		return this.service.getOneById(payload)
 	}
 
+	@UseGuards(AuthGuard)
+	@ApiBearerAuth()
 	@Post()
 	@ApiResponse({ type: MutationResponseDto })
 	create(@Body() payload: CategoryCreateRequestDto): Promise<MutationResponse> {
 		return this.service.create(payload)
 	}
 
+	@UseGuards(AuthGuard)
+	@ApiBearerAuth()
 	@Patch(':id')
 	@ApiResponse({ type: MutationResponseDto })
 	update(@Param() param: CategoryGetOneByIdRequestDto, @Body() payload: CategoryUpdateRequestDto): Promise<MutationResponse> {
 		return this.service.update(param, payload)
 	}
 
+	@UseGuards(AuthGuard)
+	@ApiBearerAuth()
 	@Delete(':id')
 	@ApiResponse({ type: MutationResponseDto })
 	delete(@Param() param: CategoryDeleteRequestDto): Promise<MutationResponse> {

@@ -54,6 +54,10 @@ export class CategoryService {
 	}
 
 	async delete(payload: CategoryDeleteRequest): Promise<MutationResponse> {
+		const ca = await this.getOne(payload)
+		if (!ca) {
+			throw new BadRequestException('category not found')
+		}
 		return this.repo.delete(payload)
 	}
 }

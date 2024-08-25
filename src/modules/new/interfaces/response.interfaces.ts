@@ -6,9 +6,11 @@ export declare interface NewGetOneResponse {
 	id: string
 	name: string
 	description: string
-	authorId: string
+	adminId: string
 	viewsCount: number
 	isTop: boolean
+	mainImage: string
+	images: string[]
 	createdAt: Date
 }
 
@@ -18,8 +20,10 @@ export declare interface NewGetOneForAdminResponse {
 	id: string
 	name: CreateInManyLangs
 	description: CreateInManyLangs
-	authorId: string
+	adminId: string
 	viewsCount: number
 	isTop: boolean
+	mainImage: string
+	images: string[]
 	createdAt: Date
 }

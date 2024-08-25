@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Delete, Get, Headers, Param, Patch, Post, Query, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common'
+import { BadRequestException, Body, Controller, Delete, Get, Headers, Param, Patch, Post, Query, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common'
 import { BuildingService } from './building.service'
 import { ApiBearerAuth, ApiConsumes, ApiResponse, ApiTags } from '@nestjs/swagger'
 import {
@@ -14,12 +14,10 @@ import {
 } from './dtos'
 import { BuildingGetAllForAdminResponse, BuildingGetAllResponse, BuildingGetOneForAdminResponse, BuildingGetOneResponse } from './interfaces'
 import { AuthGuard, LanguageDto, MutationResponseDto, PAGE_NUMBER, PAGE_SIZE, PAGINATION } from '../../common'
-import { MutationResponse } from '../../interfaces'
-import { FileInterceptor } from '@nestjs/platform-express'
+import { CustomUploadedFiles, MutationResponse } from '../../interfaces'
+import { FileFieldsInterceptor } from '@nestjs/platform-express'
 
 @ApiTags('building')
-@UseGuards(AuthGuard)
-@ApiBearerAuth()
 @Controller('building')
 export class BuildingController {
 	private readonly service: BuildingService
@@ -43,6 +41,8 @@ export class BuildingController {
 	}
 
 	@ApiTags('admin-panel')
+	@UseGuards(AuthGuard)
+	@ApiBearerAuth()
 	@Get('for-admin')
 	@ApiResponse({ type: BuildingGetAllForAdminResponseDto })
 	@ApiResponse({ type: BuildingGetOneForAdminResponseDto, isArray: true })
@@ -61,25 +61,41 @@ export class BuildingController {
 		return this.service.getOneById(payload, header['accept-language'])
 	}
 
+	@UseGuards(AuthGuard)
+	@ApiBearerAuth()
 	@Post()
 	@ApiConsumes('multipart/form-data')
-	@UseInterceptors(FileInterceptor('image'))
+	@UseInterceptors(
+		FileFieldsInterceptor([
+			{ name: 'image', maxCount: 1 },
+			{ name: 'images', maxCount: 10 },
+		]),
+	)
 	@ApiResponse({ type: MutationResponseDto })
-	create(@Body() payload: BuildingCreateRequestDto, @UploadedFile() image: Express.Multer.File): Promise<MutationResponse> {
-		if (!image) {
+	create(@Body() payload: BuildingCreateRequestDto, @UploadedFiles() files: CustomUploadedFiles): Promise<MutationResponse> {
+		if (!files.image.length) {
 			throw new BadRequestException('image cannot be empty')
 		}
-		return this.service.create({ ...payload, image: image.filename })
+		return this.service.create({ ...payload, image: files.image[0].filename, images: files.images })
 	}
 
+	@UseGuards(AuthGuard)
+	@ApiBearerAuth()
 	@Patch(':id')
 	@ApiConsumes('multipart/form-data')
-	@UseInterceptors(FileInterceptor('image'))
+	@UseInterceptors(
+		FileFieldsInterceptor([
+			{ name: 'image', maxCount: 1 },
+			{ name: 'images', maxCount: 10 },
+		]),
+	)
 	@ApiResponse({ type: MutationResponseDto })
-	update(@Param() param: BuildingGetOneByIdRequestDto, @Body() payload: BuildingUpdateRequestDto, @UploadedFile() image: Express.Multer.File): Promise<MutationResponse> {
-		return this.service.update(param, { ...payload, image: image ? image?.filename || undefined : undefined })
+	update(@Param() param: BuildingGetOneByIdRequestDto, @Body() payload: BuildingUpdateRequestDto, @UploadedFiles() files: CustomUploadedFiles): Promise<MutationResponse> {
+		return this.service.update(param, { ...payload, image: files?.image?.length ? files?.image[0].filename ?? undefined : undefined, images: files.images })
 	}
 
+	@UseGuards(AuthGuard)
+	@ApiBearerAuth()
 	@Delete(':id')
 	@ApiResponse({ type: MutationResponseDto })
 	delete(@Param() param: BuildingDeleteRequestDto): Promise<MutationResponse> {

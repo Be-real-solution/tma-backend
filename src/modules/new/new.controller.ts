@@ -14,15 +14,12 @@ import {
 	NewUpdateRequestDto,
 } from './dtos'
 import { NewGetAllForAdminResponse, NewGetAllResponse, NewGetOneForAdminResponse, NewGetOneResponse } from './interfaces'
-import { AuthGuard, LanguageGuard, MutationResponseDto, PAGE_NUMBER, PAGE_SIZE, PAGINATION } from '../../common'
-import { MutationResponse } from '../../interfaces'
-import { FilesInterceptor } from '@nestjs/platform-express'
+import { AuthGuard, MutationResponseDto, PAGE_NUMBER, PAGE_SIZE, PAGINATION } from '../../common'
+import { CustomUploadedFiles, MutationResponse } from '../../interfaces'
+import { FileFieldsInterceptor } from '@nestjs/platform-express'
 import { LanguageEnum } from '@prisma/client'
 
 @ApiTags('new')
-@UseGuards(AuthGuard)
-@UseGuards(LanguageGuard)
-@ApiBearerAuth()
 @Controller('new')
 export class NewController {
 	private readonly service: NewService
@@ -46,6 +43,8 @@ export class NewController {
 	}
 
 	@ApiTags('admin-panel')
+	@UseGuards(AuthGuard)
+	@ApiBearerAuth()
 	@Get('for-admin')
 	@ApiResponse({ type: NewGetAllForAdminResponseDto })
 	@ApiResponse({ type: NewGetOneForAdminResponseDto, isArray: true })
@@ -71,32 +70,50 @@ export class NewController {
 		return this.service.getOneById(payload, lang)
 	}
 
+	@UseGuards(AuthGuard)
+	@ApiBearerAuth()
 	@Post()
 	@ApiConsumes('multipart/form-data')
-	@UseInterceptors(FilesInterceptor('images'))
+	@UseInterceptors(
+		FileFieldsInterceptor([
+			{ name: 'image', maxCount: 1 },
+			{ name: 'images', maxCount: 10 },
+		]),
+	)
 	@ApiResponse({ type: MutationResponseDto })
-	create(@Body() payload: NewCreateRequestDto, @UploadedFiles() images: Array<Express.Multer.File>): Promise<MutationResponse> {
-		if (!images.length) {
-			throw new BadRequestException('must have at least 1 image')
+	create(@Body() payload: NewCreateRequestDto, @UploadedFiles() files: CustomUploadedFiles): Promise<MutationResponse> {
+		if (!files || !files.image.length) {
+			throw new BadRequestException('main image must be provided')
 		}
 
-		return this.service.create({ ...payload, images: images })
+		return this.service.create({ ...payload, image: files?.image[0].filename, images: files.images })
 	}
 
+	@UseGuards(AuthGuard)
+	@ApiBearerAuth()
 	@Patch('many-carousel')
 	@ApiResponse({ type: MutationResponseDto })
 	updateManyCarousel(@Body() payload: NewUpdateManyCarouselDto): Promise<MutationResponse> {
 		return this.service.updateManyCarousel(payload)
 	}
 
+	@UseGuards(AuthGuard)
+	@ApiBearerAuth()
 	@Patch(':id')
 	@ApiConsumes('multipart/form-data')
-	@UseInterceptors(FilesInterceptor('images'))
+	@UseInterceptors(
+		FileFieldsInterceptor([
+			{ name: 'image', maxCount: 1 },
+			{ name: 'images', maxCount: 10 },
+		]),
+	)
 	@ApiResponse({ type: MutationResponseDto })
-	update(@Param() param: NewGetOneByIdRequestDto, @Body() payload: NewUpdateRequestDto, @UploadedFiles() images: Array<Express.Multer.File>): Promise<MutationResponse> {
-		return this.service.update(param, { ...payload, images: images })
+	update(@Param() param: NewGetOneByIdRequestDto, @Body() payload: NewUpdateRequestDto, @UploadedFiles() files: CustomUploadedFiles): Promise<MutationResponse> {
+		return this.service.update(param, { ...payload, image: files?.image.length ? files.image[0].filename || undefined : undefined, images: files.images })
 	}
 
+	@UseGuards(AuthGuard)
+	@ApiBearerAuth()
 	@Delete(':id')
 	@ApiResponse({ type: MutationResponseDto })
 	delete(@Param() param: NewDeleteRequestDto): Promise<MutationResponse> {
