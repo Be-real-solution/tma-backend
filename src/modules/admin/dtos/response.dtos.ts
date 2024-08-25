@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { PaginationResponseDto } from '../../../common'
+import { CResponseDto, PaginationResponseDto } from '../../../common'
 import { AdminGetAllResponse, AdminGetOneResponse } from '../interfaces'
 import { newRandomUUID } from '../../../common/helpers'
 
@@ -20,4 +20,14 @@ export class AdminGetOneResponseDto implements AdminGetOneResponse {
 export class AdminGetAllResponseDto extends PaginationResponseDto implements AdminGetAllResponse {
 	@ApiProperty({ type: AdminGetOneResponseDto, isArray: true })
 	data: AdminGetOneResponse[]
+}
+
+export class AdminGetOneResDto extends CResponseDto<AdminGetOneResponse> {
+	@ApiProperty({ type: AdminGetOneResponseDto })
+	data: AdminGetOneResponse
+}
+
+export class AdminGetAllResDto extends CResponseDto<AdminGetAllResponse> {
+	@ApiProperty({ type: AdminGetAllResponseDto })
+	data: AdminGetAllResponse
 }

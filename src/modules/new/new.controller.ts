@@ -14,8 +14,8 @@ import {
 	NewUpdateRequestDto,
 } from './dtos'
 import { NewGetAllForAdminResponse, NewGetAllResponse, NewGetOneForAdminResponse, NewGetOneResponse } from './interfaces'
-import { AuthGuard, MutationResponseDto, PAGE_NUMBER, PAGE_SIZE, PAGINATION } from '../../common'
-import { CustomUploadedFiles, MutationResponse } from '../../interfaces'
+import { AuthGuard, MutationResDto, MutationResponseDto, PAGE_NUMBER, PAGE_SIZE, PAGINATION } from '../../common'
+import { CResponse, CustomUploadedFiles, MutationResponse } from '../../interfaces'
 import { FileFieldsInterceptor } from '@nestjs/platform-express'
 import { LanguageEnum } from '@prisma/client'
 
@@ -30,7 +30,7 @@ export class NewController {
 	@Get()
 	@ApiResponse({ type: NewGetAllResponseDto })
 	@ApiResponse({ type: NewGetOneResponseDto, isArray: true })
-	getAll(@Query() payload: NewGetAllRequestDto, @Headers('accept-language') lang: LanguageEnum): Promise<NewGetAllResponse | NewGetOneResponse[]> {
+	getAll(@Query() payload: NewGetAllRequestDto, @Headers('accept-language') lang: LanguageEnum): Promise<CResponse<NewGetAllResponse | NewGetOneResponse[]>> {
 		return this.service.getAll(
 			{
 				...payload,
@@ -48,7 +48,7 @@ export class NewController {
 	@Get('for-admin')
 	@ApiResponse({ type: NewGetAllForAdminResponseDto })
 	@ApiResponse({ type: NewGetOneForAdminResponseDto, isArray: true })
-	getAllForAdmin(@Query() payload: NewGetAllRequestDto): Promise<NewGetAllForAdminResponse | NewGetOneForAdminResponse[]> {
+	getAllForAdmin(@Query() payload: NewGetAllRequestDto): Promise<CResponse<NewGetAllForAdminResponse | NewGetOneForAdminResponse[]>> {
 		return this.service.getAllForAdmin({
 			...payload,
 			pageNumber: payload.pageNumber ?? PAGE_NUMBER,
@@ -60,13 +60,13 @@ export class NewController {
 	@Get('carousel')
 	@ApiResponse({ type: NewGetAllResponseDto })
 	@ApiResponse({ type: NewGetOneResponseDto, isArray: true })
-	getAllForCarousel(@Headers('accept-language') lang: LanguageEnum): Promise<NewGetAllResponse | NewGetOneResponse[]> {
+	getAllForCarousel(@Headers('accept-language') lang: LanguageEnum): Promise<CResponse<NewGetAllResponse | NewGetOneResponse[]>> {
 		return this.service.getAll({ isTop: true, pagination: false }, lang)
 	}
 
 	@Get(':id')
 	@ApiResponse({ type: NewGetOneResponseDto })
-	getOneById(@Param() payload: NewGetOneByIdRequestDto, @Headers('accept-language') lang: LanguageEnum): Promise<NewGetOneResponse> {
+	getOneById(@Param() payload: NewGetOneByIdRequestDto, @Headers('accept-language') lang: LanguageEnum): Promise<CResponse<NewGetOneResponse>> {
 		return this.service.getOneById(payload, lang)
 	}
 
@@ -81,7 +81,7 @@ export class NewController {
 		]),
 	)
 	@ApiResponse({ type: MutationResponseDto })
-	create(@Body() payload: NewCreateRequestDto, @UploadedFiles() files: CustomUploadedFiles): Promise<MutationResponse> {
+	create(@Body() payload: NewCreateRequestDto, @UploadedFiles() files: CustomUploadedFiles): Promise<CResponse<MutationResponse>> {
 		if (!files || !files.image.length) {
 			throw new BadRequestException('main image must be provided')
 		}
@@ -92,8 +92,8 @@ export class NewController {
 	@UseGuards(AuthGuard)
 	@ApiBearerAuth()
 	@Patch('many-carousel')
-	@ApiResponse({ type: MutationResponseDto })
-	updateManyCarousel(@Body() payload: NewUpdateManyCarouselDto): Promise<MutationResponse> {
+	@ApiResponse({ type: MutationResDto })
+	updateManyCarousel(@Body() payload: NewUpdateManyCarouselDto): Promise<CResponse<MutationResponse>> {
 		return this.service.updateManyCarousel(payload)
 	}
 
@@ -107,16 +107,16 @@ export class NewController {
 			{ name: 'images', maxCount: 10 },
 		]),
 	)
-	@ApiResponse({ type: MutationResponseDto })
-	update(@Param() param: NewGetOneByIdRequestDto, @Body() payload: NewUpdateRequestDto, @UploadedFiles() files: CustomUploadedFiles): Promise<MutationResponse> {
+	@ApiResponse({ type: MutationResDto })
+	update(@Param() param: NewGetOneByIdRequestDto, @Body() payload: NewUpdateRequestDto, @UploadedFiles() files: CustomUploadedFiles): Promise<CResponse<MutationResponse>> {
 		return this.service.update(param, { ...payload, image: files?.image.length ? files.image[0].filename || undefined : undefined, images: files.images })
 	}
 
 	@UseGuards(AuthGuard)
 	@ApiBearerAuth()
 	@Delete(':id')
-	@ApiResponse({ type: MutationResponseDto })
-	delete(@Param() param: NewDeleteRequestDto): Promise<MutationResponse> {
+	@ApiResponse({ type: MutationResDto })
+	delete(@Param() param: NewDeleteRequestDto): Promise<CResponse<MutationResponse>> {
 		return this.service.delete(param)
 	}
 }

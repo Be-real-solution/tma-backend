@@ -4,6 +4,7 @@ import * as bcrypt from 'bcrypt'
 import { AdminSignInRequest, AdminSignInResponse, Tokens } from './interfaces'
 import { JwtService } from '@nestjs/jwt'
 import { JwtConfig } from '../../configs'
+import { CResponse } from '../../interfaces'
 
 @Injectable()
 export class AuthService {
@@ -14,7 +15,7 @@ export class AuthService {
 		this.jwtService = jwtService
 	}
 
-	async adminSignIn(payload: AdminSignInRequest): Promise<AdminSignInResponse> {
+	async adminSignIn(payload: AdminSignInRequest): Promise<CResponse<AdminSignInResponse>> {
 		const admin = await this.repo.adminGetOne({ username: payload.username })
 		if (!admin) {
 			throw new UnauthorizedException('admin not found')
@@ -26,7 +27,7 @@ export class AuthService {
 		}
 		delete admin.password
 		const tokens = await this.getTokens({ id: admin.id })
-		return { admin: admin, tokens: tokens }
+		return { data: { admin: admin, tokens: tokens }, status: 200 }
 	}
 
 	private async getTokens(payload: { id: string }): Promise<Tokens> {

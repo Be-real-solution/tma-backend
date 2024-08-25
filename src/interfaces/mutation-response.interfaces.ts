@@ -1,3 +1,3 @@
-export class MutationResponse {
+export declare interface MutationResponse {
 	id: string
 }

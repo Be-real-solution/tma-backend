@@ -1,11 +1,11 @@
-import { AdminGetAllResponseDto, AdminGetOneResponseDto } from './dtos/response.dtos'
-import { Body, Controller, Delete, Get, Headers, Param, Patch, Post, Query, UseGuards } from '@nestjs/common'
+import { AdminGetAllResDto, AdminGetOneResDto } from './dtos/response.dtos'
+import { Body, Controller, Delete, Get, Headers, HttpCode, HttpStatus, Param, Patch, Post, Query, UseGuards } from '@nestjs/common'
 import { AdminService } from './admin.service'
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger'
-import { AuthGuard, MutationResponseDto, PAGE_NUMBER, PAGE_SIZE, PAGINATION } from '../../common'
+import { AuthGuard, MutationResDto, PAGE_NUMBER, PAGE_SIZE, PAGINATION } from '../../common'
 import { AdminCreateRequestDto, AdminDeleteRequestDto, AdminGetAllRequestDto, AdminGetOneByIdRequestDto, AdminUpdateRequestDto } from './dtos'
 import { AdminGetAllResponse, AdminGetOneResponse } from './interfaces'
-import { MutationResponse } from '../../interfaces'
+import { CResponse, MutationResponse } from '../../interfaces'
 
 @ApiTags('admin')
 @ApiBearerAuth()
@@ -17,10 +17,11 @@ export class AdminController {
 	}
 
 	@UseGuards(AuthGuard)
+	@HttpCode(HttpStatus.OK)
 	@Get()
-	@ApiResponse({ type: AdminGetAllResponseDto })
-	@ApiResponse({ type: AdminGetOneResponseDto, isArray: true })
-	getAll(@Query() payload: AdminGetAllRequestDto): Promise<AdminGetAllResponse | AdminGetOneResponse[]> {
+	@ApiResponse({ type: AdminGetAllResDto })
+	@ApiResponse({ type: AdminGetOneResDto, isArray: true })
+	getAll(@Query() payload: AdminGetAllRequestDto): Promise<CResponse<AdminGetAllResponse | AdminGetOneResponse[]>> {
 		return this.service.getAll({
 			...payload,
 			pageNumber: payload.pageNumber ?? PAGE_NUMBER,
@@ -30,29 +31,33 @@ export class AdminController {
 	}
 
 	@UseGuards(AuthGuard)
+	@HttpCode(HttpStatus.OK)
 	@Get(':id')
-	@ApiResponse({ type: AdminGetOneResponseDto })
-	getOneById(@Param() payload: AdminGetOneByIdRequestDto): Promise<AdminGetOneResponse> {
+	@ApiResponse({ type: AdminGetOneResDto })
+	getOneById(@Param() payload: AdminGetOneByIdRequestDto): Promise<CResponse<AdminGetOneResponse>> {
 		return this.service.getOneById(payload)
 	}
 
 	@Post()
-	@ApiResponse({ type: MutationResponseDto })
-	create(@Body() payload: AdminCreateRequestDto, @Headers() headers: { authorization?: string }): Promise<MutationResponse> {
+	@HttpCode(HttpStatus.OK)
+	@ApiResponse({ type: MutationResDto })
+	create(@Body() payload: AdminCreateRequestDto, @Headers() headers: { authorization?: string }): Promise<CResponse<MutationResponse>> {
 		return this.service.create(payload, headers.authorization)
 	}
 
 	@UseGuards(AuthGuard)
+	@HttpCode(HttpStatus.OK)
 	@Patch(':id')
-	@ApiResponse({ type: MutationResponseDto })
-	update(@Param() param: AdminGetOneByIdRequestDto, @Body() payload: AdminUpdateRequestDto): Promise<MutationResponse> {
+	@ApiResponse({ type: MutationResDto })
+	update(@Param() param: AdminGetOneByIdRequestDto, @Body() payload: AdminUpdateRequestDto): Promise<CResponse<MutationResponse>> {
 		return this.service.update(param, payload)
 	}
 
 	@UseGuards(AuthGuard)
+	@HttpCode(HttpStatus.OK)
 	@Delete(':id')
-	@ApiResponse({ type: MutationResponseDto })
-	delete(@Param() param: AdminDeleteRequestDto): Promise<MutationResponse> {
+	@ApiResponse({ type: MutationResDto })
+	delete(@Param() param: AdminDeleteRequestDto): Promise<CResponse<MutationResponse>> {
 		return this.service.delete(param)
 	}
 }

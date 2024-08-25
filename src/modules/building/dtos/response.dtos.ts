@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { CreateInManyLangsDto, PaginationResponseDto } from '../../../common'
+import { CreateInManyLangsDto, CResponseDto, PaginationResponseDto } from '../../../common'
 import { BuildingGetAllForAdminResponse, BuildingGetAllResponse, BuildingGetOneForAdminResponse, BuildingGetOneResponse } from '../interfaces'
 import { newRandomUUID } from '../../../common/helpers'
 import { CreateInManyLangs } from '../../../interfaces'
@@ -80,4 +80,26 @@ export class BuildingGetOneForAdminResponseDto implements BuildingGetOneForAdmin
 export class BuildingGetAllForAdminResponseDto extends PaginationResponseDto implements BuildingGetAllForAdminResponse {
 	@ApiProperty({ type: BuildingGetOneForAdminResponseDto, isArray: true })
 	data: BuildingGetOneForAdminResponse[]
+}
+
+//======================
+
+export class BuildingGetOneResDto extends CResponseDto<BuildingGetOneResponse> {
+	@ApiProperty({ type: BuildingGetOneResponseDto })
+	data: BuildingGetOneResponse
+}
+
+export class BuildingGetAllResDto extends CResponseDto<BuildingGetAllResponse> {
+	@ApiProperty({ type: BuildingGetAllResponseDto })
+	data: BuildingGetAllResponse
+}
+
+export class BuildingGetOneForAdminResDto extends CResponseDto<BuildingGetOneForAdminResponse> {
+	@ApiProperty({ type: BuildingGetOneForAdminResponseDto })
+	data: BuildingGetOneForAdminResponse
+}
+
+export class BuildingGetAllForAdminResDto extends CResponseDto<BuildingGetAllForAdminResponse> {
+	@ApiProperty({ type: BuildingGetAllForAdminResponseDto })
+	data: BuildingGetAllForAdminResponse
 }

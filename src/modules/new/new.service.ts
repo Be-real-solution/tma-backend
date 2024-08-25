@@ -13,7 +13,7 @@ import {
 	NewUpdateManyCarousel,
 	NewUpdateRequest,
 } from './interfaces'
-import { MutationResponse } from '../../interfaces'
+import { CResponse, MutationResponse } from '../../interfaces'
 import { NewImageService } from '../new-image'
 import { TranslationService } from '../translation'
 import { LanguageEnum } from '@prisma/client'
@@ -31,7 +31,7 @@ export class NewService {
 		this.translationService = translationService
 	}
 
-	async getAll(payload: NewGetAllRequest, lang: LanguageEnum): Promise<NewGetAllResponse | NewGetOneResponse[]> {
+	async getAll(payload: NewGetAllRequest, lang: LanguageEnum): Promise<CResponse<NewGetAllResponse | NewGetOneResponse[]>> {
 		const searchedData = await this.translationService.getAll({
 			language: lang,
 			text: [payload.name ?? '', payload.description ?? ''],
@@ -65,7 +65,7 @@ export class NewService {
 				}
 			})
 
-			return mappedNews
+			return { data: mappedNews, status: 200 }
 		} else {
 			mappedNews = news.data.map((n) => {
 				return {
@@ -76,13 +76,16 @@ export class NewService {
 			})
 		}
 		return {
-			data: mappedNews,
-			pagesCount: news.pagesCount,
-			pageSize: news.pageSize,
+			data: {
+				data: mappedNews,
+				pagesCount: news.pagesCount,
+				pageSize: news.pageSize,
+			},
+			status: 200,
 		}
 	}
 
-	async getAllForAdmin(payload: NewGetAllRequest): Promise<NewGetAllForAdminResponse | NewGetOneForAdminResponse[]> {
+	async getAllForAdmin(payload: NewGetAllRequest): Promise<CResponse<NewGetAllForAdminResponse | NewGetOneForAdminResponse[]>> {
 		const searchedData = await this.translationService.getAll({
 			text: [payload.name ?? '', payload.description ?? ''],
 			tableFields: [TranslatedTableFields.newName, TranslatedTableFields.newDescription],
@@ -114,7 +117,7 @@ export class NewService {
 				}
 			})
 
-			return mappedNews
+			return { data: mappedNews, status: 200 }
 		} else {
 			mappedNews = news.data.map((n) => {
 				return {
@@ -125,13 +128,16 @@ export class NewService {
 			})
 		}
 		return {
-			data: mappedNews,
-			pagesCount: news.pagesCount,
-			pageSize: news.pageSize,
+			data: {
+				data: mappedNews,
+				pagesCount: news.pagesCount,
+				pageSize: news.pageSize,
+			},
+			status: 200,
 		}
 	}
 
-	async getOneById(payload: NewGetOneByIdRequest, lang: LanguageEnum): Promise<NewGetOneResponse> {
+	async getOneById(payload: NewGetOneByIdRequest, lang: LanguageEnum): Promise<CResponse<NewGetOneResponse>> {
 		const neww = await this.repo.getOneById(payload)
 		if (!neww) {
 			throw new BadRequestException('new not found')
@@ -147,9 +153,12 @@ export class NewService {
 		await this.update({ id: neww.id }, { viewsCount: neww.viewsCount + 1 })
 
 		return {
-			...neww,
-			name: translatedObject[`${neww.id}=${TranslatedTableFields.newName}`] || neww.name,
-			description: translatedObject[`${neww.id}=${TranslatedTableFields.newDescription}`] || neww.description,
+			data: {
+				...neww,
+				name: translatedObject[`${neww.id}=${TranslatedTableFields.newName}`] || neww.name,
+				description: translatedObject[`${neww.id}=${TranslatedTableFields.newDescription}`] || neww.description,
+			},
+			status: 200,
 		}
 	}
 
@@ -159,7 +168,7 @@ export class NewService {
 		return neww
 	}
 
-	async create(payload: NewCreateRequest): Promise<MutationResponse> {
+	async create(payload: NewCreateRequest): Promise<CResponse<MutationResponse>> {
 		const existsInTr = await this.translationService.getAll2({
 			text: [payload.name.uz, payload.name.ru, payload.name.en],
 			tableFields: [TranslatedTableFields.newName],
@@ -172,10 +181,10 @@ export class NewService {
 		payload?.images?.length ? await this.newImageService.createMany({ datas: payload.images.map((i) => ({ newId: neww.id, imageLink: i.filename })) }) : null
 		await this.createInManyLang(neww.id, payload, 'create')
 
-		return neww
+		return { data: neww, status: 200 }
 	}
 
-	async update(param: NewGetOneByIdRequest, payload: NewUpdateRequest): Promise<MutationResponse> {
+	async update(param: NewGetOneByIdRequest, payload: NewUpdateRequest): Promise<CResponse<MutationResponse>> {
 		const ca = await this.getOne(param)
 		if (!ca) {
 			throw new BadRequestException('new not found')
@@ -187,16 +196,16 @@ export class NewService {
 		payload?.images?.length ? await this.newImageService.createMany({ datas: payload.images.map((i) => ({ newId: updatedNew.id, imageLink: i.filename })) }) : null
 		await this.createInManyLang(updatedNew.id, payload, 'update')
 
-		return updatedNew
+		return { data: updatedNew, status: 200 }
 	}
 
-	async updateManyCarousel(payload: NewUpdateManyCarousel): Promise<MutationResponse> {
+	async updateManyCarousel(payload: NewUpdateManyCarousel): Promise<CResponse<MutationResponse>> {
 		const neww = await this.repo.updateManyCarousel(payload)
 
-		return neww
+		return { data: neww, status: 200 }
 	}
 
-	async delete(payload: NewDeleteRequest): Promise<MutationResponse> {
+	async delete(payload: NewDeleteRequest): Promise<CResponse<MutationResponse>> {
 		const ca = await this.getOne(payload)
 		if (!ca) {
 			throw new BadRequestException('new not found')
@@ -204,7 +213,7 @@ export class NewService {
 		const neww = await this.repo.delete(payload)
 		await this.translationService.deleteMany({ tableId: neww.id })
 
-		return neww
+		return { data: neww, status: 200 }
 	}
 
 	private async checkUpdateFields(param: NewGetOneByIdRequest, payload: NewUpdateRequest): Promise<void> {

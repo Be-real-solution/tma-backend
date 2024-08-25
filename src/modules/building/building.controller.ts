@@ -4,17 +4,17 @@ import { ApiBearerAuth, ApiConsumes, ApiResponse, ApiTags } from '@nestjs/swagge
 import {
 	BuildingCreateRequestDto,
 	BuildingDeleteRequestDto,
-	BuildingGetAllForAdminResponseDto,
+	BuildingGetAllForAdminResDto,
 	BuildingGetAllRequestDto,
-	BuildingGetAllResponseDto,
+	BuildingGetAllResDto,
 	BuildingGetOneByIdRequestDto,
-	BuildingGetOneForAdminResponseDto,
-	BuildingGetOneResponseDto,
+	BuildingGetOneForAdminResDto,
+	BuildingGetOneResDto,
 	BuildingUpdateRequestDto,
 } from './dtos'
 import { BuildingGetAllForAdminResponse, BuildingGetAllResponse, BuildingGetOneForAdminResponse, BuildingGetOneResponse } from './interfaces'
-import { AuthGuard, LanguageDto, MutationResponseDto, PAGE_NUMBER, PAGE_SIZE, PAGINATION } from '../../common'
-import { CustomUploadedFiles, MutationResponse } from '../../interfaces'
+import { AuthGuard, LanguageDto, MutationResDto, PAGE_NUMBER, PAGE_SIZE, PAGINATION } from '../../common'
+import { CResponse, CustomUploadedFiles, MutationResponse } from '../../interfaces'
 import { FileFieldsInterceptor } from '@nestjs/platform-express'
 
 @ApiTags('building')
@@ -26,9 +26,9 @@ export class BuildingController {
 	}
 
 	@Get()
-	@ApiResponse({ type: BuildingGetAllResponseDto })
-	@ApiResponse({ type: BuildingGetOneResponseDto, isArray: true })
-	getAll(@Query() payload: BuildingGetAllRequestDto, @Headers() header: LanguageDto): Promise<BuildingGetAllResponse | BuildingGetOneResponse[]> {
+	@ApiResponse({ type: BuildingGetAllResDto })
+	@ApiResponse({ type: BuildingGetOneResDto, isArray: true })
+	getAll(@Query() payload: BuildingGetAllRequestDto, @Headers() header: LanguageDto): Promise<CResponse<BuildingGetAllResponse | BuildingGetOneResponse[]>> {
 		return this.service.getAll(
 			{
 				...payload,
@@ -44,9 +44,9 @@ export class BuildingController {
 	@UseGuards(AuthGuard)
 	@ApiBearerAuth()
 	@Get('for-admin')
-	@ApiResponse({ type: BuildingGetAllForAdminResponseDto })
-	@ApiResponse({ type: BuildingGetOneForAdminResponseDto, isArray: true })
-	getAllForAdmin(@Query() payload: BuildingGetAllRequestDto): Promise<BuildingGetAllForAdminResponse | BuildingGetOneForAdminResponse[]> {
+	@ApiResponse({ type: BuildingGetAllForAdminResDto })
+	@ApiResponse({ type: BuildingGetOneForAdminResDto, isArray: true })
+	getAllForAdmin(@Query() payload: BuildingGetAllRequestDto): Promise<CResponse<BuildingGetAllForAdminResponse | BuildingGetOneForAdminResponse[]>> {
 		return this.service.getAllForAdmin({
 			...payload,
 			pageNumber: payload.pageNumber ?? PAGE_NUMBER,
@@ -56,8 +56,8 @@ export class BuildingController {
 	}
 
 	@Get(':id')
-	@ApiResponse({ type: BuildingGetOneResponseDto })
-	getOneById(@Param() payload: BuildingGetOneByIdRequestDto, @Headers() header: LanguageDto): Promise<BuildingGetOneResponse> {
+	@ApiResponse({ type: BuildingGetOneResDto })
+	getOneById(@Param() payload: BuildingGetOneByIdRequestDto, @Headers() header: LanguageDto): Promise<CResponse<BuildingGetOneResponse>> {
 		return this.service.getOneById(payload, header['accept-language'])
 	}
 
@@ -71,8 +71,8 @@ export class BuildingController {
 			{ name: 'images', maxCount: 10 },
 		]),
 	)
-	@ApiResponse({ type: MutationResponseDto })
-	create(@Body() payload: BuildingCreateRequestDto, @UploadedFiles() files: CustomUploadedFiles): Promise<MutationResponse> {
+	@ApiResponse({ type: MutationResDto })
+	create(@Body() payload: BuildingCreateRequestDto, @UploadedFiles() files: CustomUploadedFiles): Promise<CResponse<MutationResponse>> {
 		if (!files.image.length) {
 			throw new BadRequestException('image cannot be empty')
 		}
@@ -89,16 +89,20 @@ export class BuildingController {
 			{ name: 'images', maxCount: 10 },
 		]),
 	)
-	@ApiResponse({ type: MutationResponseDto })
-	update(@Param() param: BuildingGetOneByIdRequestDto, @Body() payload: BuildingUpdateRequestDto, @UploadedFiles() files: CustomUploadedFiles): Promise<MutationResponse> {
+	@ApiResponse({ type: MutationResDto })
+	update(
+		@Param() param: BuildingGetOneByIdRequestDto,
+		@Body() payload: BuildingUpdateRequestDto,
+		@UploadedFiles() files: CustomUploadedFiles,
+	): Promise<CResponse<MutationResponse>> {
 		return this.service.update(param, { ...payload, image: files?.image?.length ? files?.image[0].filename ?? undefined : undefined, images: files.images })
 	}
 
 	@UseGuards(AuthGuard)
 	@ApiBearerAuth()
 	@Delete(':id')
-	@ApiResponse({ type: MutationResponseDto })
-	delete(@Param() param: BuildingDeleteRequestDto): Promise<MutationResponse> {
+	@ApiResponse({ type: MutationResDto })
+	delete(@Param() param: BuildingDeleteRequestDto): Promise<CResponse<MutationResponse>> {
 		return this.service.delete(param)
 	}
 }

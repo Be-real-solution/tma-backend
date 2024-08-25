@@ -12,7 +12,7 @@ import {
 	BuildingGetOneResponse,
 	BuildingUpdateRequest,
 } from './interfaces'
-import { MutationResponse } from '../../interfaces'
+import { CResponse, MutationResponse } from '../../interfaces'
 import { TranslationService } from '../translation'
 import { LanguageEnum } from '@prisma/client'
 import { TranslatedTableFields } from '../../common'
@@ -30,7 +30,7 @@ export class BuildingService {
 		this.translationService = translationService
 	}
 
-	async getAll(payload: BuildingGetAllRequest, lang: LanguageEnum): Promise<BuildingGetAllResponse | BuildingGetOneResponse[]> {
+	async getAll(payload: BuildingGetAllRequest, lang: LanguageEnum): Promise<CResponse<BuildingGetAllResponse | BuildingGetOneResponse[]>> {
 		const searchedData = await this.translationService.getAll({
 			language: lang,
 			text: [payload.name ?? '', payload.address ?? ''],
@@ -64,7 +64,7 @@ export class BuildingService {
 				}
 			})
 
-			return mappedBuildings
+			return { data: mappedBuildings, status: 200 }
 		} else {
 			mappedBuildings = buildings.data.map((b) => {
 				return {
@@ -75,13 +75,16 @@ export class BuildingService {
 			})
 		}
 		return {
-			data: mappedBuildings,
-			pagesCount: buildings.pagesCount,
-			pageSize: buildings.pageSize,
+			status: 200,
+			data: {
+				data: mappedBuildings,
+				pagesCount: buildings.pagesCount,
+				pageSize: buildings.pageSize,
+			},
 		}
 	}
 
-	async getAllForAdmin(payload: BuildingGetAllRequest): Promise<BuildingGetAllForAdminResponse | BuildingGetOneForAdminResponse[]> {
+	async getAllForAdmin(payload: BuildingGetAllRequest): Promise<CResponse<BuildingGetAllForAdminResponse | BuildingGetOneForAdminResponse[]>> {
 		const searchedData = await this.translationService.getAll({
 			text: [payload.name ?? '', payload.address ?? ''],
 			tableFields: [TranslatedTableFields.buildingName, TranslatedTableFields.buildingAddress],
@@ -113,7 +116,7 @@ export class BuildingService {
 				}
 			})
 
-			return mappedBuildings
+			return { data: mappedBuildings, status: 200 }
 		} else {
 			mappedBuildings = buildings.data.map((b) => {
 				return {
@@ -124,13 +127,16 @@ export class BuildingService {
 			})
 		}
 		return {
-			data: mappedBuildings,
-			pagesCount: buildings.pagesCount,
-			pageSize: buildings.pageSize,
+			data: {
+				data: mappedBuildings,
+				pagesCount: buildings.pagesCount,
+				pageSize: buildings.pageSize,
+			},
+			status: 200,
 		}
 	}
 
-	async getOneById(payload: BuildingGetOneByIdRequest, lang: LanguageEnum): Promise<BuildingGetOneResponse> {
+	async getOneById(payload: BuildingGetOneByIdRequest, lang: LanguageEnum): Promise<CResponse<BuildingGetOneResponse>> {
 		const building = await this.repo.getOneById(payload)
 		if (!building) {
 			throw new BadRequestException('building not found')
@@ -145,9 +151,12 @@ export class BuildingService {
 		const translatedObject = await TranslationArrayToObject(translations)
 
 		return {
-			...building,
-			name: translatedObject[`${building.id}=${TranslatedTableFields.buildingName}`] || building.name,
-			address: translatedObject[`${building.id}=${TranslatedTableFields.buildingAddress}`] || building.address,
+			status: 200,
+			data: {
+				...building,
+				name: translatedObject[`${building.id}=${TranslatedTableFields.buildingName}`] || building.name,
+				address: translatedObject[`${building.id}=${TranslatedTableFields.buildingAddress}`] || building.address,
+			},
 		}
 	}
 
@@ -163,7 +172,7 @@ export class BuildingService {
 		return building
 	}
 
-	async create(payload: BuildingCreateRequest): Promise<MutationResponse> {
+	async create(payload: BuildingCreateRequest): Promise<CResponse<MutationResponse>> {
 		const existsInTr = await this.translationService.getAll2({ text: [payload.name.uz, payload.name.ru, payload.name.en], tableFields: [TranslatedTableFields.buildingName] })
 		if (existsInTr.length) {
 			throw new BadRequestException('building name already exists')
@@ -173,10 +182,10 @@ export class BuildingService {
 		payload.images.length ? await this.buildingImageService.createMany({ datas: payload.images.map((i) => ({ buildingId: building.id, imageLink: i.filename })) }) : null
 		await this.createInManyLang(building.id, payload, 'create')
 
-		return building
+		return { data: building, status: 200 }
 	}
 
-	async update(param: BuildingGetOneByIdRequest, payload: BuildingUpdateRequest): Promise<MutationResponse> {
+	async update(param: BuildingGetOneByIdRequest, payload: BuildingUpdateRequest): Promise<CResponse<MutationResponse>> {
 		const ca = await this.getOne(param)
 		if (!ca) {
 			throw new BadRequestException('building not found')
@@ -188,17 +197,17 @@ export class BuildingService {
 		payload.images?.length ? await this.buildingImageService.createMany({ datas: payload.images.map((i) => ({ buildingId: building.id, imageLink: i.filename })) }) : null
 		await this.createInManyLang(building.id, payload, 'update')
 
-		return building
+		return { data: building, status: 200 }
 	}
 
-	async delete(payload: BuildingDeleteRequest): Promise<MutationResponse> {
+	async delete(payload: BuildingDeleteRequest): Promise<CResponse<MutationResponse>> {
 		const ca = await this.getOne(payload)
 		if (!ca) {
 			throw new BadRequestException('building not found')
 		}
 		const building = await this.repo.delete(payload)
 		await this.translationService.deleteMany({ tableId: building.id })
-		return building
+		return { data: building, status: 200 }
 	}
 
 	private async checkUpdateFields(param: BuildingGetOneByIdRequest, payload: BuildingUpdateRequest): Promise<void> {

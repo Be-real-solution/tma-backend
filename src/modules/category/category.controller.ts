@@ -1,11 +1,11 @@
-import { CategoryGetAllResponseDto, CategoryGetOneResponseDto } from './dtos/response.dtos'
+import { CategoryGetAllResDto, CategoryGetOneResDto } from './dtos/response.dtos'
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common'
 import { CategoryService } from './category.service'
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger'
-import { AuthGuard, MutationResponseDto, PAGE_NUMBER, PAGE_SIZE, PAGINATION } from '../../common'
+import { AuthGuard, MutationResDto, PAGE_NUMBER, PAGE_SIZE, PAGINATION } from '../../common'
 import { CategoryCreateRequestDto, CategoryDeleteRequestDto, CategoryGetAllRequestDto, CategoryGetOneByIdRequestDto, CategoryUpdateRequestDto } from './dtos'
 import { CategoryGetAllResponse, CategoryGetOneResponse } from './interfaces'
-import { MutationResponse } from '../../interfaces'
+import { CResponse, MutationResponse } from '../../interfaces'
 
 @ApiTags('category')
 @Controller('category')
@@ -16,9 +16,9 @@ export class CategoryController {
 	}
 
 	@Get()
-	@ApiResponse({ type: CategoryGetAllResponseDto })
-	@ApiResponse({ type: CategoryGetOneResponseDto, isArray: true })
-	getAll(@Query() payload: CategoryGetAllRequestDto): Promise<CategoryGetAllResponse | CategoryGetOneResponse[]> {
+	@ApiResponse({ type: CategoryGetAllResDto })
+	@ApiResponse({ type: CategoryGetOneResDto, isArray: true })
+	getAll(@Query() payload: CategoryGetAllRequestDto): Promise<CResponse<CategoryGetAllResponse | CategoryGetOneResponse[]>> {
 		return this.service.getAll({
 			...payload,
 			pageNumber: payload.pageNumber ?? PAGE_NUMBER,
@@ -28,32 +28,32 @@ export class CategoryController {
 	}
 
 	@Get(':id')
-	@ApiResponse({ type: CategoryGetOneResponseDto })
-	getOneById(@Param() payload: CategoryGetOneByIdRequestDto): Promise<CategoryGetOneResponse> {
+	@ApiResponse({ type: CategoryGetOneResDto })
+	getOneById(@Param() payload: CategoryGetOneByIdRequestDto): Promise<CResponse<CategoryGetOneResponse>> {
 		return this.service.getOneById(payload)
 	}
 
 	@UseGuards(AuthGuard)
 	@ApiBearerAuth()
 	@Post()
-	@ApiResponse({ type: MutationResponseDto })
-	create(@Body() payload: CategoryCreateRequestDto): Promise<MutationResponse> {
+	@ApiResponse({ type: MutationResDto })
+	create(@Body() payload: CategoryCreateRequestDto): Promise<CResponse<MutationResponse>> {
 		return this.service.create(payload)
 	}
 
 	@UseGuards(AuthGuard)
 	@ApiBearerAuth()
 	@Patch(':id')
-	@ApiResponse({ type: MutationResponseDto })
-	update(@Param() param: CategoryGetOneByIdRequestDto, @Body() payload: CategoryUpdateRequestDto): Promise<MutationResponse> {
+	@ApiResponse({ type: MutationResDto })
+	update(@Param() param: CategoryGetOneByIdRequestDto, @Body() payload: CategoryUpdateRequestDto): Promise<CResponse<MutationResponse>> {
 		return this.service.update(param, payload)
 	}
 
 	@UseGuards(AuthGuard)
 	@ApiBearerAuth()
 	@Delete(':id')
-	@ApiResponse({ type: MutationResponseDto })
-	delete(@Param() param: CategoryDeleteRequestDto): Promise<MutationResponse> {
+	@ApiResponse({ type: MutationResDto })
+	delete(@Param() param: CategoryDeleteRequestDto): Promise<CResponse<MutationResponse>> {
 		return this.service.delete(param)
 	}
 }

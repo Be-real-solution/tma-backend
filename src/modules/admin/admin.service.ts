@@ -11,7 +11,7 @@ import {
 	AdminGetOneResponse,
 	AdminUpdateRequest,
 } from './interfaces'
-import { MutationResponse } from '../../interfaces'
+import { CResponse, MutationResponse } from '../../interfaces'
 import { JwtService } from '@nestjs/jwt'
 import { JwtConfig } from '../../configs'
 
@@ -24,16 +24,17 @@ export class AdminService {
 		this.jwtService = jwtService
 	}
 
-	async getAll(payload: AdminGetAllRequest): Promise<AdminGetAllResponse | AdminGetOneResponse[]> {
-		return this.repo.getAll(payload)
+	async getAll(payload: AdminGetAllRequest): Promise<CResponse<AdminGetAllResponse | AdminGetOneResponse[]>> {
+		const data = await this.repo.getAll(payload)
+		return { data: data, status: 200 }
 	}
 
-	async getOneById(payload: AdminGetOneByIdRequest): Promise<AdminGetOneResponse> {
+	async getOneById(payload: AdminGetOneByIdRequest): Promise<CResponse<AdminGetOneResponse>> {
 		const admin = await this.repo.getOneById(payload)
 		if (!admin) {
 			throw new BadRequestException('admin not found')
 		}
-		return admin
+		return { data: admin, status: 200 }
 	}
 
 	async getOne(payload: AdminGetOneRequest): Promise<AdminGetOneResponse> {
@@ -42,7 +43,7 @@ export class AdminService {
 		return admin
 	}
 
-	async create(payload: AdminCreateRequest, authorization: string): Promise<MutationResponse> {
+	async create(payload: AdminCreateRequest, authorization: string): Promise<CResponse<MutationResponse>> {
 		const admins = await this.getAll({ pagination: false })
 		if (Array.isArray(admins)) {
 			if (admins.length) {
@@ -69,10 +70,11 @@ export class AdminService {
 		}
 		const password = await bcrypt.hash(payload.password, 7)
 
-		return this.repo.create({ ...payload, password: password })
+		const admin = await this.repo.create({ ...payload, password: password })
+		return { data: admin, status: 200 }
 	}
 
-	async update(param: AdminGetOneByIdRequest, payload: AdminUpdateRequest): Promise<MutationResponse> {
+	async update(param: AdminGetOneByIdRequest, payload: AdminUpdateRequest): Promise<CResponse<MutationResponse>> {
 		const ca = await this.getOne(param)
 		if (!ca) {
 			throw new BadRequestException('admin not found')
@@ -85,14 +87,16 @@ export class AdminService {
 		}
 		const password = payload.password ? await bcrypt.hash(payload.password, 7) : undefined
 
-		return this.repo.update({ ...param, ...payload, password: password })
+		const admin = await this.repo.update({ ...param, ...payload, password: password })
+		return { data: admin, status: 200 }
 	}
 
-	async delete(payload: AdminDeleteRequest): Promise<MutationResponse> {
+	async delete(payload: AdminDeleteRequest): Promise<CResponse<MutationResponse>> {
 		const ca = await this.getOne(payload)
 		if (!ca) {
 			throw new BadRequestException('admin not found')
 		}
-		return this.repo.delete(payload)
+		const admin = await this.repo.delete(payload)
+		return { data: admin, status: 200 }
 	}
 }

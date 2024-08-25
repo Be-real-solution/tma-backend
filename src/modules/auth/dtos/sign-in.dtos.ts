@@ -3,6 +3,7 @@ import { AdminGetOneResponse } from '../../admin/interfaces'
 import { AdminSignInRequest, AdminSignInResponse, Tokens } from '../interfaces'
 import { IsNotEmpty, IsString } from 'class-validator'
 import { AdminGetOneResponseDto } from '../../admin/dtos'
+import { CResponseDto } from '../../../common'
 
 export class AdminSignInRequestDto implements AdminSignInRequest {
 	@ApiProperty({ type: String })
@@ -30,4 +31,9 @@ export class AdminSignInResponseDto implements AdminSignInResponse {
 
 	@ApiProperty({ type: TokensDto })
 	tokens: Tokens
+}
+
+export class AdminSignInResDto extends CResponseDto<AdminSignInResponse> {
+	@ApiProperty({ type: AdminSignInResponseDto })
+	data: AdminSignInResponse
 }

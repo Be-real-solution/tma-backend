@@ -10,7 +10,7 @@ import {
 	CategoryGetOneResponse,
 	CategoryUpdateRequest,
 } from './interfaces'
-import { MutationResponse } from '../../interfaces'
+import { CResponse, MutationResponse } from '../../interfaces'
 
 @Injectable()
 export class CategoryService {
@@ -19,16 +19,17 @@ export class CategoryService {
 		this.repo = repo
 	}
 
-	async getAll(payload: CategoryGetAllRequest): Promise<CategoryGetAllResponse | CategoryGetOneResponse[]> {
-		return this.repo.getAll(payload)
+	async getAll(payload: CategoryGetAllRequest): Promise<CResponse<CategoryGetAllResponse | CategoryGetOneResponse[]>> {
+		const categories = await this.repo.getAll(payload)
+		return { data: categories, status: 200 }
 	}
 
-	async getOneById(payload: CategoryGetOneByIdRequest): Promise<CategoryGetOneResponse> {
+	async getOneById(payload: CategoryGetOneByIdRequest): Promise<CResponse<CategoryGetOneResponse>> {
 		const category = await this.repo.getOneById(payload)
 		if (!category) {
 			throw new BadRequestException('category not found')
 		}
-		return category
+		return { data: category, status: 200 }
 	}
 
 	async getOne(payload: CategoryGetOneRequest): Promise<CategoryGetOneResponse> {
@@ -37,27 +38,30 @@ export class CategoryService {
 		return category
 	}
 
-	async create(payload: CategoryCreateRequest): Promise<MutationResponse> {
+	async create(payload: CategoryCreateRequest): Promise<CResponse<MutationResponse>> {
 		const candidate = await this.getOne({ name: payload.name })
 		if (candidate) {
-			return candidate
+			throw new BadRequestException('name already exists')
 		}
-		return this.repo.create(payload)
+		const category = await this.repo.create(payload)
+		return { data: category, status: 200 }
 	}
 
-	async update(param: CategoryGetOneByIdRequest, payload: CategoryUpdateRequest): Promise<MutationResponse> {
+	async update(param: CategoryGetOneByIdRequest, payload: CategoryUpdateRequest): Promise<CResponse<MutationResponse>> {
 		const ca = await this.getOne(param)
 		if (!ca) {
 			throw new BadRequestException('category not found')
 		}
-		return this.repo.update({ ...param, ...payload })
+		const category = await this.repo.update({ ...param, ...payload })
+		return { data: category, status: 200 }
 	}
 
-	async delete(payload: CategoryDeleteRequest): Promise<MutationResponse> {
+	async delete(payload: CategoryDeleteRequest): Promise<CResponse<MutationResponse>> {
 		const ca = await this.getOne(payload)
 		if (!ca) {
 			throw new BadRequestException('category not found')
 		}
-		return this.repo.delete(payload)
+		const category = await this.repo.delete(payload)
+		return { data: category, status: 200 }
 	}
 }
