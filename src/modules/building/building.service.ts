@@ -33,8 +33,8 @@ export class BuildingService {
 	async getAll(payload: BuildingGetAllRequest, lang: LanguageEnum): Promise<CResponse<BuildingGetAllResponse | BuildingGetOneResponse[]>> {
 		const searchedData = await this.translationService.getAll({
 			language: lang,
-			text: [payload.name ?? '', payload.address ?? ''],
-			tableFields: [TranslatedTableFields.buildingName, TranslatedTableFields.buildingAddress],
+			text: [payload.name ?? '', payload.address ?? '', payload.description ?? ''],
+			tableFields: [TranslatedTableFields.buildingName, TranslatedTableFields.buildingAddress, TranslatedTableFields.buildingDescription],
 		})
 
 		const tableIds: string[] = []
@@ -44,12 +44,12 @@ export class BuildingService {
 			}
 		}
 
-		const buildings = await this.repo.getAll({ ...payload, ids: tableIds, name: undefined, address: undefined })
+		const buildings = await this.repo.getAll({ ...payload, ids: tableIds, name: undefined, address: undefined, description: undefined })
 
 		let mappedBuildings
 		const translations = await this.translationService.getAll({
 			language: lang,
-			tableFields: [TranslatedTableFields.buildingName, TranslatedTableFields.buildingAddress],
+			tableFields: [TranslatedTableFields.buildingName, TranslatedTableFields.buildingAddress, TranslatedTableFields.buildingDescription],
 			tableIds: Array.isArray(buildings) ? buildings.map((b) => b.id) : buildings.data.map((b) => b.id),
 		})
 
@@ -61,6 +61,7 @@ export class BuildingService {
 					...b,
 					name: translatedObject[`${b.id}=${TranslatedTableFields.buildingName}`] || b.name,
 					address: translatedObject[`${b.id}=${TranslatedTableFields.buildingAddress}`] || b.address,
+					description: translatedObject[`${b.id}=${TranslatedTableFields.buildingDescription}`] || b.description,
 				}
 			})
 
@@ -71,6 +72,7 @@ export class BuildingService {
 					...b,
 					name: translatedObject[`${b.id}=${TranslatedTableFields.buildingName}`] || b.name,
 					address: translatedObject[`${b.id}=${TranslatedTableFields.buildingAddress}`] || b.address,
+					description: translatedObject[`${b.id}=${TranslatedTableFields.buildingDescription}`] || b.description,
 				}
 			})
 		}
@@ -86,8 +88,8 @@ export class BuildingService {
 
 	async getAllForAdmin(payload: BuildingGetAllRequest): Promise<CResponse<BuildingGetAllForAdminResponse | BuildingGetOneForAdminResponse[]>> {
 		const searchedData = await this.translationService.getAll({
-			text: [payload.name ?? '', payload.address ?? ''],
-			tableFields: [TranslatedTableFields.buildingName, TranslatedTableFields.buildingAddress],
+			text: [payload.name ?? '', payload.address ?? '', payload.description ?? ''],
+			tableFields: [TranslatedTableFields.buildingName, TranslatedTableFields.buildingAddress, TranslatedTableFields.buildingDescription],
 		})
 
 		const tableIds: string[] = []
@@ -97,11 +99,11 @@ export class BuildingService {
 			}
 		}
 
-		const buildings = await this.repo.getAll({ ...payload, ids: tableIds, name: undefined, address: undefined })
+		const buildings = await this.repo.getAll({ ...payload, ids: tableIds, name: undefined, address: undefined, description: undefined })
 
 		let mappedBuildings
 		const translations = await this.translationService.getAll({
-			tableFields: [TranslatedTableFields.buildingName, TranslatedTableFields.buildingAddress],
+			tableFields: [TranslatedTableFields.buildingName, TranslatedTableFields.buildingAddress, TranslatedTableFields.buildingDescription],
 			tableIds: Array.isArray(buildings) ? buildings.map((b) => b.id) : buildings.data.map((b) => b.id),
 		})
 
@@ -113,6 +115,7 @@ export class BuildingService {
 					...b,
 					name: translatedObject[`${b.id}=${TranslatedTableFields.buildingName}`],
 					address: translatedObject[`${b.id}=${TranslatedTableFields.buildingAddress}`],
+					description: translatedObject[`${b.id}=${TranslatedTableFields.buildingDescription}`],
 				}
 			})
 
@@ -123,6 +126,7 @@ export class BuildingService {
 					...b,
 					name: translatedObject[`${b.id}=${TranslatedTableFields.buildingName}`],
 					address: translatedObject[`${b.id}=${TranslatedTableFields.buildingAddress}`],
+					description: translatedObject[`${b.id}=${TranslatedTableFields.buildingDescription}`],
 				}
 			})
 		}
@@ -144,7 +148,7 @@ export class BuildingService {
 
 		const translations = await this.translationService.getAll({
 			language: lang,
-			tableFields: [TranslatedTableFields.buildingName, TranslatedTableFields.buildingAddress],
+			tableFields: [TranslatedTableFields.buildingName, TranslatedTableFields.buildingAddress, TranslatedTableFields.buildingDescription],
 			tableIds: [building.id],
 		})
 
@@ -156,6 +160,7 @@ export class BuildingService {
 				...building,
 				name: translatedObject[`${building.id}=${TranslatedTableFields.buildingName}`] || building.name,
 				address: translatedObject[`${building.id}=${TranslatedTableFields.buildingAddress}`] || building.address,
+				description: translatedObject[`${building.id}=${TranslatedTableFields.buildingDescription}`] || building.description,
 			},
 		}
 	}
@@ -262,6 +267,12 @@ export class BuildingService {
 						tableId: id,
 						text: payload.address[k],
 					})),
+					...Object.keys(payload.description).map((k: LanguageEnum) => ({
+						language: k,
+						tableField: TranslatedTableFields.buildingDescription,
+						tableId: id,
+						text: payload.description[k],
+					})),
 				],
 			})
 		} else {
@@ -281,6 +292,27 @@ export class BuildingService {
 							tableField: TranslatedTableFields.buildingName,
 							tableId: id,
 							text: payload.name[k as LanguageEnum],
+						})
+					}
+				}
+			}
+
+			if (payload.description && Object.values(payload.description).length) {
+				for (const k of Object.keys(payload.description)) {
+					const exists = await this.translationService.getAll({
+						language: k as LanguageEnum,
+						tableFields: [TranslatedTableFields.buildingDescription],
+						tableIds: [id],
+					})
+
+					if (exists.length) {
+						await this.translationService.update({ id: exists[0].id }, { text: payload.description[k as LanguageEnum] })
+					} else {
+						await this.translationService.create({
+							language: k as LanguageEnum,
+							tableField: TranslatedTableFields.buildingDescription,
+							tableId: id,
+							text: payload.description[k as LanguageEnum],
 						})
 					}
 				}

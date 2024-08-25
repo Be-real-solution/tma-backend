@@ -82,6 +82,7 @@ model Building {
   id             String     @map("id")               @db.Uuid          @default(dbgenerated("GEN_RANDOM_UUID()"))
   name           String     @map("name")             @db.VarChar() 
   address        String     @map("address")          @db.VarChar()
+  description    String     @map("description")      @db.VarChar()     @default("")
   phoneNumber    String     @map("phoneNumber")      @db.VarChar()
   latitude       String     @map("latitude")         @db.VarChar(10)
   longitude      String     @map("longitude")        @db.VarChar(10)

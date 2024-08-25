@@ -3,6 +3,7 @@ import { CreateInManyLangs, PaginationRequest, UpdateInManyLangs } from '../../.
 export declare interface BuildingGetAllRequest extends PaginationRequest {
 	name?: string
 	address?: string
+	description?: string
 	phoneNumber?: string
 	workStartTime?: string
 	workEndTime?: string
@@ -16,6 +17,7 @@ export declare interface BuildingGetOneRequest {
 	id?: string
 	name?: string
 	address?: string
+	description?: string
 	phoneNumber?: string
 	workEndTime?: string
 	workStartTime?: string
@@ -26,6 +28,7 @@ export declare interface BuildingGetOneRequest {
 export declare interface BuildingCreateRequest {
 	name: CreateInManyLangs
 	address: CreateInManyLangs
+	description: CreateInManyLangs
 	latitude: string
 	longitude: string
 	phoneNumber: string
@@ -39,6 +42,7 @@ export declare interface BuildingCreateRequest {
 export declare interface BuildingUpdateRequest {
 	name?: UpdateInManyLangs
 	address?: UpdateInManyLangs
+	description?: UpdateInManyLangs
 	latitude?: string
 	longitude?: string
 	phoneNumber?: string

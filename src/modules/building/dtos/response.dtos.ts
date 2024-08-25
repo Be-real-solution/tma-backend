@@ -15,6 +15,9 @@ export class BuildingGetOneResponseDto implements BuildingGetOneResponse {
 	address: string
 
 	@ApiProperty({ type: String })
+	description: string
+
+	@ApiProperty({ type: String })
 	mainImage: string
 
 	@ApiProperty({ type: String, isArray: true })
@@ -49,6 +52,9 @@ export class BuildingGetOneForAdminResponseDto implements BuildingGetOneForAdmin
 
 	@ApiProperty({ type: CreateInManyLangsDto })
 	name: CreateInManyLangs
+
+	@ApiProperty({ type: CreateInManyLangsDto })
+	description: CreateInManyLangs
 
 	@ApiProperty({ type: CreateInManyLangsDto })
 	address: CreateInManyLangs

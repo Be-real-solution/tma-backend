@@ -6,6 +6,7 @@ export declare interface BuildingGetOneResponse {
 	id: string
 	name: string
 	address: string
+	description: string
 	latitude: string
 	longitude: string
 	phoneNumber: string
@@ -22,6 +23,7 @@ export declare interface BuildingGetOneForAdminResponse {
 	id: string
 	name: CreateInManyLangs
 	address: CreateInManyLangs
+	description: CreateInManyLangs
 	latitude: string
 	longitude: string
 	phoneNumber: string

@@ -20,6 +20,11 @@ export class BuildingGetAllRequestDto extends PaginationRequestDto implements Bu
 	@ApiPropertyOptional({ type: String })
 	@IsString()
 	@IsOptional()
+	description?: string
+
+	@ApiPropertyOptional({ type: String })
+	@IsString()
+	@IsOptional()
 	phoneNumber?: string
 
 	@ApiPropertyOptional({ type: String })
@@ -52,6 +57,12 @@ export class BuildingCreateRequestDto implements BuildingCreateRequest {
 	@Type(() => CreateInManyLangsDto)
 	@IsNotEmpty()
 	address: CreateInManyLangs
+
+	@ApiProperty({ type: CreateInManyLangsDto })
+	@ValidateNested()
+	@Type(() => CreateInManyLangsDto)
+	@IsNotEmpty()
+	description: CreateInManyLangs
 
 	@ApiProperty({ type: 'string', format: 'binary' })
 	image: any
@@ -97,6 +108,12 @@ export class BuildingUpdateRequestDto implements BuildingUpdateRequest {
 	@IsOptional()
 	@Type(() => UpdateInManyLangsDto)
 	address?: UpdateInManyLangs
+
+	@ApiPropertyOptional({ type: UpdateInManyLangsDto })
+	@ValidateNested()
+	@IsOptional()
+	@Type(() => UpdateInManyLangsDto)
+	description?: UpdateInManyLangs
 
 	@ApiPropertyOptional({ type: 'string', format: 'binary' })
 	image?: any
