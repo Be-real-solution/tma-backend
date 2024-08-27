@@ -16,7 +16,7 @@ export class AuthRepo {
 				fullName: payload.fullName,
 				username: payload.username,
 			},
-			select: { createdAt: true, fullName: true, id: true, password: true, username: true },
+			select: { createdAt: true, fullName: true, id: true, type: true, password: true, username: true },
 		})
 
 		return admin

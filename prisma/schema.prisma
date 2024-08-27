@@ -13,12 +13,18 @@ enum LanguageEnum {
   en    @map("en")
 }
 
+enum AdminTypeEnum {
+  admin  @map("admin")
+  super  @map("super")
+}
+
 
 model Admin {
   id         String     @map("id")          @db.Uuid          @default(dbgenerated("GEN_RANDOM_UUID()"))
   fullName   String     @map("full_name")   @db.VarChar() 
   username   String     @map("username")    @db.VarChar() 
   password   String     @map("password")    @db.VarChar() 
+  type       AdminTypeEnum                                    @default(admin)
   createdAt  DateTime   @map("created_at")  @db.Timestamp     @default(now())
   updatedAt  DateTime   @map("updated_at")  @db.Timestamp     @updatedAt
   deletedAt  DateTime?  @map("deleted_at")  @db.Timestamp

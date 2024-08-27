@@ -1,8 +1,19 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { CreateInManyLangsDto, CResponseDto, PaginationResponseDto } from '../../../common'
-import { BuildingGetAllForAdminResponse, BuildingGetAllResponse, BuildingGetOneForAdminResponse, BuildingGetOneResponse } from '../interfaces'
+import { BuildingGetAllForAdminResponse, BuildingGetAllResponse, BuildingGetOneForAdminResponse, BuildingGetOneResponse, BuildingImage } from '../interfaces'
 import { newRandomUUID } from '../../../common/helpers'
 import { CreateInManyLangs } from '../../../interfaces'
+
+export class BuildingImageDto implements BuildingImage {
+	@ApiProperty({ type: String, example: newRandomUUID() })
+	id: string
+
+	@ApiProperty({ type: String })
+	imageLink: string
+
+	@ApiProperty({ type: Date, example: new Date() })
+	createdAt: Date
+}
 
 export class BuildingGetOneResponseDto implements BuildingGetOneResponse {
 	@ApiProperty({ type: String, example: newRandomUUID })
@@ -20,8 +31,8 @@ export class BuildingGetOneResponseDto implements BuildingGetOneResponse {
 	@ApiProperty({ type: String })
 	mainImage: string
 
-	@ApiProperty({ type: String, isArray: true })
-	images: string[]
+	@ApiProperty({ type: BuildingImageDto, isArray: true })
+	images: BuildingImage[]
 
 	@ApiProperty({ type: String })
 	phoneNumber: string
@@ -62,8 +73,8 @@ export class BuildingGetOneForAdminResponseDto implements BuildingGetOneForAdmin
 	@ApiProperty({ type: String })
 	mainImage: string
 
-	@ApiProperty({ type: String, isArray: true })
-	images: string[]
+	@ApiProperty({ type: BuildingImageDto, isArray: true })
+	images: BuildingImage[]
 
 	@ApiProperty({ type: String })
 	phoneNumber: string

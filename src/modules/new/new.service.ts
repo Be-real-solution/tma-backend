@@ -162,6 +162,29 @@ export class NewService {
 		}
 	}
 
+	async getOneByIdForAdmin(payload: NewGetOneByIdRequest): Promise<CResponse<NewGetOneForAdminResponse>> {
+		const neww = await this.repo.getOneById(payload)
+		if (!neww) {
+			throw new BadRequestException('new not found')
+		}
+
+		const translations = await this.translationService.getAll({
+			tableFields: [TranslatedTableFields.newName, TranslatedTableFields.newDescription],
+			tableIds: [neww.id],
+		})
+
+		const translatedObject = await TranslationArrayToObject2(translations)
+
+		return {
+			status: 200,
+			data: {
+				...neww,
+				name: translatedObject[`${neww.id}=${TranslatedTableFields.newName}`],
+				description: translatedObject[`${neww.id}=${TranslatedTableFields.newDescription}`],
+			},
+		}
+	}
+
 	async getOne(payload: NewGetOneRequest): Promise<NewGetOneResponse> {
 		const neww = await this.repo.getOne(payload)
 

@@ -1,4 +1,12 @@
 import { CreateInManyLangs, PaginationResponse } from '../../../interfaces'
+import { AdminGetOneResponse } from '../../admin/interfaces'
+import { CategoryGetOneResponse } from '../../category/interfaces'
+
+export declare interface NewImage {
+	id: string
+	imageLink: string
+	createdAt: Date
+}
 
 export declare type NewGetAllResponse = PaginationResponse<NewGetOneResponse>
 
@@ -6,11 +14,12 @@ export declare interface NewGetOneResponse {
 	id: string
 	name: string
 	description: string
-	adminId: string
+	admin: AdminGetOneResponse
+	category: CategoryGetOneResponse
 	viewsCount: number
 	isTop: boolean
 	mainImage: string
-	images: string[]
+	images: NewImage[]
 	createdAt: Date
 }
 
@@ -20,10 +29,11 @@ export declare interface NewGetOneForAdminResponse {
 	id: string
 	name: CreateInManyLangs
 	description: CreateInManyLangs
-	adminId: string
+	admin: AdminGetOneResponse
+	category: CategoryGetOneResponse
 	viewsCount: number
 	isTop: boolean
 	mainImage: string
-	images: string[]
+	images: NewImage[]
 	createdAt: Date
 }

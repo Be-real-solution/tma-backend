@@ -2,6 +2,11 @@ import { CreateInManyLangs, PaginationResponse } from '../../../interfaces'
 
 export declare type BuildingGetAllResponse = PaginationResponse<BuildingGetOneResponse>
 
+export declare interface BuildingImage {
+	id: string
+	imageLink: string
+	createdAt: Date
+}
 export declare interface BuildingGetOneResponse {
 	id: string
 	name: string
@@ -13,7 +18,7 @@ export declare interface BuildingGetOneResponse {
 	workStartTime: string
 	workEndTime: string
 	mainImage: string
-	images: string[]
+	images: BuildingImage[]
 	createdAt: Date
 }
 
@@ -30,6 +35,6 @@ export declare interface BuildingGetOneForAdminResponse {
 	workStartTime: string
 	workEndTime: string
 	mainImage: string
-	images: string[]
+	images: BuildingImage[]
 	createdAt: Date
 }

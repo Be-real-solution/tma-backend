@@ -1,8 +1,9 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import { PaginationRequestDto } from '../../../common'
 import { AdminCreateRequest, AdminDeleteRequest, AdminGetAllRequest, AdminGetOneByIdRequest, AdminUpdateRequest } from '../interfaces'
-import { IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator'
+import { IsEnum, IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator'
 import { newRandomUUID } from '../../../common/helpers'
+import { $Enums, AdminTypeEnum } from '@prisma/client'
 
 export class AdminGetAllRequestDto extends PaginationRequestDto implements AdminGetAllRequest {
 	@ApiPropertyOptional({ type: String })
@@ -14,6 +15,11 @@ export class AdminGetAllRequestDto extends PaginationRequestDto implements Admin
 	@IsString()
 	@IsOptional()
 	username?: string
+
+	@ApiPropertyOptional({ type: String })
+	@IsEnum(AdminTypeEnum)
+	@IsOptional()
+	type?: $Enums.AdminTypeEnum
 }
 
 export class AdminGetOneByIdRequestDto implements AdminGetOneByIdRequest {
@@ -38,6 +44,11 @@ export class AdminCreateRequestDto implements AdminCreateRequest {
 	@IsString()
 	@IsNotEmpty()
 	username: string
+
+	@ApiPropertyOptional({ type: String })
+	@IsEnum(AdminTypeEnum)
+	@IsOptional()
+	type?: $Enums.AdminTypeEnum
 }
 
 export class AdminUpdateRequestDto implements AdminUpdateRequest {
@@ -55,6 +66,11 @@ export class AdminUpdateRequestDto implements AdminUpdateRequest {
 	@IsString()
 	@IsOptional()
 	username?: string
+
+	@ApiPropertyOptional({ type: String })
+	@IsEnum(AdminTypeEnum)
+	@IsOptional()
+	type?: $Enums.AdminTypeEnum
 }
 
 export class AdminDeleteRequestDto implements AdminDeleteRequest {

@@ -165,6 +165,30 @@ export class BuildingService {
 		}
 	}
 
+	async getOneByIdForAdmin(payload: BuildingGetOneByIdRequest): Promise<CResponse<BuildingGetOneForAdminResponse>> {
+		const building = await this.repo.getOneById(payload)
+		if (!building) {
+			throw new BadRequestException('building not found')
+		}
+
+		const translations = await this.translationService.getAll({
+			tableFields: [TranslatedTableFields.buildingName, TranslatedTableFields.buildingAddress, TranslatedTableFields.buildingDescription],
+			tableIds: [building.id],
+		})
+
+		const translatedObject = await TranslationArrayToObject2(translations)
+
+		return {
+			status: 200,
+			data: {
+				...building,
+				name: translatedObject[`${building.id}=${TranslatedTableFields.buildingName}`],
+				address: translatedObject[`${building.id}=${TranslatedTableFields.buildingAddress}`],
+				description: translatedObject[`${building.id}=${TranslatedTableFields.buildingDescription}`],
+			},
+		}
+	}
+
 	async getOne(payload: BuildingGetOneRequest): Promise<BuildingGetOneResponse> {
 		const building = await this.repo.getOne(payload)
 
@@ -191,7 +215,9 @@ export class BuildingService {
 	}
 
 	async update(param: BuildingGetOneByIdRequest, payload: BuildingUpdateRequest): Promise<CResponse<MutationResponse>> {
-		const ca = await this.getOne(param)
+		console.log(payload)
+		const ca = await this.getOneByIdForAdmin(param)
+		console.log('can', ca)
 		if (!ca) {
 			throw new BadRequestException('building not found')
 		}
@@ -206,7 +232,7 @@ export class BuildingService {
 	}
 
 	async delete(payload: BuildingDeleteRequest): Promise<CResponse<MutationResponse>> {
-		const ca = await this.getOne(payload)
+		const ca = await this.getOneByIdForAdmin(payload)
 		if (!ca) {
 			throw new BadRequestException('building not found')
 		}

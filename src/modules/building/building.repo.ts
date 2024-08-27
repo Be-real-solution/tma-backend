@@ -50,14 +50,10 @@ export class BuildingRepo {
 				latitude: true,
 				longitude: true,
 				createdAt: true,
-				images: { select: { imageLink: true } },
+				images: { where: { deletedAt: null }, select: { imageLink: true, id: true, createdAt: true } },
 			},
 			...paginationOptions,
 			orderBy: [{ createdAt: 'desc' }],
-		})
-
-		const mappedBuildings = buildings.map((b) => {
-			return { ...b, images: b?.images.map((i) => i.imageLink) }
 		})
 
 		if (payload.pagination) {
@@ -76,10 +72,10 @@ export class BuildingRepo {
 			return {
 				pagesCount: Math.ceil(buildingsCount / payload.pageSize),
 				pageSize: buildings.length,
-				data: mappedBuildings,
+				data: buildings,
 			}
 		} else {
-			return mappedBuildings
+			return buildings
 		}
 	}
 
@@ -98,11 +94,11 @@ export class BuildingRepo {
 				latitude: true,
 				longitude: true,
 				createdAt: true,
-				images: { select: { imageLink: true } },
+				images: { where: { deletedAt: null }, select: { imageLink: true, id: true, createdAt: true } },
 			},
 		})
 
-		return building ? { ...building, images: building?.images.map((i) => i.imageLink) } : null
+		return building
 	}
 
 	async getOne(payload: BuildingGetOneRequest): Promise<BuildingGetOneResponse> {
@@ -130,10 +126,10 @@ export class BuildingRepo {
 				latitude: true,
 				longitude: true,
 				createdAt: true,
-				images: { select: { imageLink: true } },
+				images: { where: { deletedAt: null }, select: { imageLink: true, id: true, createdAt: true } },
 			},
 		})
-		return building ? { ...building, images: building?.images.map((i) => i.imageLink) } : null
+		return building
 	}
 
 	async getOneWithOr(payload: BuildingGetOneRequest): Promise<BuildingGetOneResponse> {
@@ -151,11 +147,11 @@ export class BuildingRepo {
 				latitude: true,
 				longitude: true,
 				createdAt: true,
-				images: { select: { imageLink: true } },
+				images: { where: { deletedAt: null }, select: { imageLink: true, id: true, createdAt: true } },
 			},
 		})
 
-		return building ? { ...building, images: building?.images.map((i) => i.imageLink) } : null
+		return building
 	}
 
 	async create(payload: BuildingCreateRequest): Promise<MutationResponse> {

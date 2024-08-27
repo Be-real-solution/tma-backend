@@ -58,19 +58,16 @@ export class NewRepo {
 				id: true,
 				name: true,
 				description: true,
-				adminId: true,
+				admin: { select: { id: true, fullName: true, username: true, type: true, createdAt: true } },
+				category: { select: { id: true, name: true, createdAt: true } },
 				viewsCount: true,
 				isTop: true,
-				mainImage: true,
-				images: { select: { imageLink: true } },
 				createdAt: true,
+				mainImage: true,
+				images: { where: { deletedAt: null }, select: { imageLink: true, id: true, createdAt: true } },
 			},
 			...paginationOptions,
 			orderBy: [{ createdAt: 'desc' }],
-		})
-
-		const mappedNews = news.map((n) => {
-			return { ...n, images: n?.images.map((i) => i.imageLink) }
 		})
 
 		if (payload.pagination) {
@@ -89,10 +86,10 @@ export class NewRepo {
 			return {
 				pagesCount: Math.ceil(newsCount / payload.pageSize),
 				pageSize: news.length,
-				data: mappedNews,
+				data: news,
 			}
 		} else {
-			return mappedNews
+			return news
 		}
 	}
 
@@ -103,16 +100,17 @@ export class NewRepo {
 				id: true,
 				name: true,
 				description: true,
-				adminId: true,
+				admin: { select: { id: true, fullName: true, username: true, type: true, createdAt: true } },
+				category: { select: { id: true, name: true, createdAt: true } },
 				viewsCount: true,
 				isTop: true,
 				createdAt: true,
 				mainImage: true,
-				images: { select: { imageLink: true } },
+				images: { where: { deletedAt: null }, select: { imageLink: true, id: true, createdAt: true } },
 			},
 		})
 
-		return neww ? { ...neww, images: neww?.images.map((i) => i.imageLink) } : null
+		return neww
 	}
 
 	async getOne(payload: NewGetOneRequest): Promise<NewGetOneResponse> {
@@ -129,16 +127,17 @@ export class NewRepo {
 				id: true,
 				name: true,
 				description: true,
-				adminId: true,
+				admin: { select: { id: true, fullName: true, username: true, type: true, createdAt: true } },
+				category: { select: { id: true, name: true, createdAt: true } },
 				viewsCount: true,
 				isTop: true,
 				createdAt: true,
 				mainImage: true,
-				images: { select: { imageLink: true } },
+				images: { where: { deletedAt: null }, select: { imageLink: true, id: true, createdAt: true } },
 			},
 		})
 
-		return neww ? { ...neww, images: neww?.images.map((i) => i.imageLink) } : null
+		return neww
 	}
 
 	async create(payload: NewCreateRequest): Promise<MutationResponse> {

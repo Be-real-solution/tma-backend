@@ -75,7 +75,7 @@ export class AdminService {
 	}
 
 	async update(param: AdminGetOneByIdRequest, payload: AdminUpdateRequest): Promise<CResponse<MutationResponse>> {
-		const ca = await this.getOne(param)
+		const ca = await this.getOneById(param)
 		if (!ca) {
 			throw new BadRequestException('admin not found')
 		}
@@ -92,7 +92,7 @@ export class AdminService {
 	}
 
 	async delete(payload: AdminDeleteRequest): Promise<CResponse<MutationResponse>> {
-		const ca = await this.getOne(payload)
+		const ca = await this.getOneById(payload)
 		if (!ca) {
 			throw new BadRequestException('admin not found')
 		}

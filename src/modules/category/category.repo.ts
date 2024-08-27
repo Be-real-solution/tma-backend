@@ -19,7 +19,7 @@ export class CategoryRepo {
 		this.prisma = prisma
 	}
 
-	async getAll(payload: CategoryGetAllRequest): Promise<CategoryGetAllResponse | CategoryGetOneResponse[]> {
+	async getAll(payload: CategoryGetAllRequest & { ids?: string[] }): Promise<CategoryGetAllResponse | CategoryGetOneResponse[]> {
 		let paginationOptions = {}
 		if (payload.pagination) {
 			paginationOptions = {
@@ -29,7 +29,10 @@ export class CategoryRepo {
 		}
 
 		const categorys = await this.prisma.category.findMany({
-			where: { deletedAt: null, name: { contains: payload.name, mode: 'insensitive' } },
+			where: {
+				deletedAt: null,
+				name: { contains: payload.name, mode: 'insensitive' },
+			},
 			select: { id: true, name: true, createdAt: true },
 			...paginationOptions,
 			orderBy: [{ createdAt: 'desc' }],
@@ -38,6 +41,45 @@ export class CategoryRepo {
 		if (payload.pagination) {
 			const categorysCount = await this.prisma.category.count({
 				where: { deletedAt: null, name: { contains: payload.name, mode: 'insensitive' } },
+			})
+
+			return {
+				pagesCount: Math.ceil(categorysCount / payload.pageSize),
+				pageSize: categorys.length,
+				data: categorys,
+			}
+		} else {
+			return categorys
+		}
+	}
+
+	async getAllHaveNews(payload: CategoryGetAllRequest & { ids?: string[] }): Promise<CategoryGetAllResponse | CategoryGetOneResponse[]> {
+		let paginationOptions = {}
+		if (payload.pagination) {
+			paginationOptions = {
+				take: payload.pageSize,
+				skip: (payload.pageNumber - 1) * payload.pageSize,
+			}
+		}
+
+		const categorys = await this.prisma.category.findMany({
+			where: {
+				deletedAt: null,
+				name: { contains: payload.name, mode: 'insensitive' },
+				news: { some: {} },
+			},
+			select: { id: true, name: true, createdAt: true },
+			...paginationOptions,
+			orderBy: [{ createdAt: 'desc' }],
+		})
+
+		if (payload.pagination) {
+			const categorysCount = await this.prisma.category.count({
+				where: {
+					deletedAt: null,
+					name: { contains: payload.name, mode: 'insensitive' },
+					news: { some: {} },
+				},
 			})
 
 			return {
@@ -70,7 +112,7 @@ export class CategoryRepo {
 
 	async create(payload: CategoryCreateRequest): Promise<MutationResponse> {
 		const category = await this.prisma.category.create({
-			data: { name: payload.name },
+			data: { name: payload.name['en'] || Object.keys(payload.name)[0] || '' },
 		})
 
 		return { id: category.id }
@@ -79,7 +121,7 @@ export class CategoryRepo {
 	async update(payload: CategoryUpdateRequest & CategoryGetOneByIdRequest): Promise<MutationResponse> {
 		const category = await this.prisma.category.update({
 			where: { deletedAt: null, id: payload.id },
-			data: { name: payload.name },
+			data: { name: payload.name?.en ?? undefined },
 		})
 
 		return { id: category.id }

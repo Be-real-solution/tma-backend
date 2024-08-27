@@ -13,6 +13,9 @@ export class AdminGetOneResponseDto implements AdminGetOneResponse {
 	@ApiProperty({ type: String })
 	username: string
 
+	@ApiProperty({ type: String })
+	type: string
+
 	@ApiProperty({ type: Date, example: new Date() })
 	createdAt: Date
 }

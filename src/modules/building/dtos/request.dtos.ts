@@ -2,7 +2,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import { CreateInManyLangsDto, PaginationRequestDto, UpdateInManyLangsDto } from '../../../common'
 import { CreateInManyLangs, UpdateInManyLangs } from '../../../interfaces'
 import { BuildingCreateRequest, BuildingDeleteRequest, BuildingGetAllRequest, BuildingGetOneByIdRequest, BuildingUpdateRequest } from '../interfaces'
-import { IsLatitude, IsLongitude, IsNotEmpty, IsOptional, IsPhoneNumber, IsString, IsUUID, ValidateNested } from 'class-validator'
+import { IsArray, IsLatitude, IsLongitude, IsNotEmpty, IsOptional, IsPhoneNumber, IsString, IsUUID, ValidateNested } from 'class-validator'
 import { IsTimeString, newRandomUUID } from '../../../common/helpers'
 import { Type } from 'class-transformer'
 
@@ -147,8 +147,8 @@ export class BuildingUpdateRequestDto implements BuildingUpdateRequest {
 	longitude?: string
 
 	@ApiPropertyOptional({ type: String, isArray: true })
-	@ValidateNested({ each: true })
-	@IsUUID('4')
+	@IsArray()
+	@IsUUID('4', { each: true })
 	@IsOptional()
 	imagesToDelete?: string[]
 }

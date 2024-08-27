@@ -55,6 +55,15 @@ export class BuildingController {
 		})
 	}
 
+	@ApiTags('admin-panel')
+	@UseGuards(AuthGuard)
+	@ApiBearerAuth()
+	@Get('for-admin/:id')
+	@ApiResponse({ type: BuildingGetOneResDto })
+	getOneByIdForAdmin(@Param() payload: BuildingGetOneByIdRequestDto): Promise<CResponse<BuildingGetOneForAdminResponse>> {
+		return this.service.getOneByIdForAdmin(payload)
+	}
+
 	@Get(':id')
 	@ApiResponse({ type: BuildingGetOneResDto })
 	getOneById(@Param() payload: BuildingGetOneByIdRequestDto, @Headers() header: LanguageDto): Promise<CResponse<BuildingGetOneResponse>> {

@@ -6,4 +6,5 @@ export enum TranslatedTableFields {
 	buildingDescription = 'building_description',
 	carouselName = 'carousel_name',
 	carouselDescription = 'carousel_description',
+	categoryName = 'category_name',
 }

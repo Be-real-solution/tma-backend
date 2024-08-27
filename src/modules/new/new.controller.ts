@@ -64,6 +64,15 @@ export class NewController {
 		return this.service.getAll({ isTop: true, pagination: false }, lang)
 	}
 
+	@ApiTags('admin-panel')
+	@UseGuards(AuthGuard)
+	@ApiBearerAuth()
+	@Get('for-admin/:id')
+	@ApiResponse({ type: NewGetOneResponseDto })
+	getOneByIdForAdmin(@Param() payload: NewGetOneByIdRequestDto): Promise<CResponse<NewGetOneForAdminResponse>> {
+		return this.service.getOneByIdForAdmin(payload)
+	}
+
 	@Get(':id')
 	@ApiResponse({ type: NewGetOneResponseDto })
 	getOneById(@Param() payload: NewGetOneByIdRequestDto, @Headers('accept-language') lang: LanguageEnum): Promise<CResponse<NewGetOneResponse>> {

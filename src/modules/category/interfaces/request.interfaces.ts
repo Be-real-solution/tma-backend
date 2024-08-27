@@ -1,4 +1,4 @@
-import { PaginationRequest } from '../../../interfaces'
+import { CreateInManyLangs, PaginationRequest, UpdateInManyLangs } from '../../../interfaces'
 
 export declare interface CategoryGetAllRequest extends PaginationRequest {
 	name?: string
@@ -14,11 +14,11 @@ export declare interface CategoryGetOneRequest {
 }
 
 export declare interface CategoryCreateRequest {
-	name: string
+	name: CreateInManyLangs
 }
 
 export declare interface CategoryUpdateRequest {
-	name?: string
+	name?: UpdateInManyLangs
 }
 
 export declare interface CategoryDeleteRequest {

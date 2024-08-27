@@ -33,8 +33,9 @@ export class AdminRepo {
 				deletedAt: null,
 				fullName: { contains: payload.fullName, mode: 'insensitive' },
 				username: { contains: payload.username, mode: 'insensitive' },
+				type: payload.type,
 			},
-			select: { id: true, fullName: true, username: true, createdAt: true },
+			select: { id: true, fullName: true, username: true, type: true, createdAt: true },
 			...paginationOptions,
 			orderBy: [{ createdAt: 'desc' }],
 		})
@@ -45,6 +46,7 @@ export class AdminRepo {
 					deletedAt: null,
 					fullName: { contains: payload.fullName, mode: 'insensitive' },
 					username: { contains: payload.username, mode: 'insensitive' },
+					type: payload.type,
 				},
 			})
 
@@ -61,7 +63,7 @@ export class AdminRepo {
 	async getOneById(payload: AdminGetOneByIdRequest): Promise<AdminGetOneResponse> {
 		const admin = await this.prisma.admin.findFirst({
 			where: { deletedAt: null, id: payload.id },
-			select: { id: true, fullName: true, username: true, createdAt: true },
+			select: { id: true, fullName: true, username: true, type: true, createdAt: true },
 		})
 
 		return admin
@@ -69,8 +71,8 @@ export class AdminRepo {
 
 	async getOne(payload: AdminGetOneRequest): Promise<AdminGetOneResponse> {
 		const admin = await this.prisma.admin.findFirst({
-			where: { deletedAt: null, id: payload.id, fullName: payload.fullName, username: payload.username },
-			select: { id: true, fullName: true, username: true, createdAt: true },
+			where: { deletedAt: null, id: payload.id, fullName: payload.fullName, username: payload.username, type: payload.type },
+			select: { id: true, fullName: true, username: true, type: true, createdAt: true },
 		})
 
 		return admin
@@ -78,7 +80,7 @@ export class AdminRepo {
 
 	async create(payload: AdminCreateRequest): Promise<MutationResponse> {
 		const admin = await this.prisma.admin.create({
-			data: { fullName: payload.fullName, username: payload.username, password: payload.password },
+			data: { fullName: payload.fullName, username: payload.username, password: payload.password, type: payload.type },
 		})
 
 		return { id: admin.id }
@@ -87,7 +89,7 @@ export class AdminRepo {
 	async update(payload: AdminUpdateRequest & AdminGetOneByIdRequest): Promise<MutationResponse> {
 		const admin = await this.prisma.admin.update({
 			where: { deletedAt: null, id: payload.id },
-			data: { fullName: payload.fullName, username: payload.username, password: payload.password },
+			data: { fullName: payload.fullName, username: payload.username, password: payload.password, type: payload.type },
 		})
 
 		return { id: admin.id }
