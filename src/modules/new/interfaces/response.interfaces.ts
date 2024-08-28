@@ -1,6 +1,6 @@
 import { CreateInManyLangs, PaginationResponse } from '../../../interfaces'
 import { AdminGetOneResponse } from '../../admin/interfaces'
-import { CategoryGetOneResponse } from '../../category/interfaces'
+import { CategoryGetOneForAdminResponse, CategoryGetOneResponse } from '../../category/interfaces'
 
 export declare interface NewImage {
 	id: string
@@ -30,7 +30,7 @@ export declare interface NewGetOneForAdminResponse {
 	name: CreateInManyLangs
 	description: CreateInManyLangs
 	admin: AdminGetOneResponse
-	category: CategoryGetOneResponse
+	category: CategoryGetOneForAdminResponse
 	viewsCount: number
 	isTop: boolean
 	mainImage: string

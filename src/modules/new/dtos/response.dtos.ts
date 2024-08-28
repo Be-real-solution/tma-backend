@@ -4,8 +4,8 @@ import { NewGetAllForAdminResponse, NewGetAllResponse, NewGetOneForAdminResponse
 import { CreateInManyLangs } from '../../../interfaces'
 import { AdminGetOneResponse } from '../../admin/interfaces'
 import { AdminGetOneResponseDto } from '../../admin/dtos'
-import { CategoryGetOneResponseDto } from '../../category/dtos'
-import { CategoryGetOneResponse } from '../../category/interfaces'
+import { CategoryGetOneForAdminResponseDto, CategoryGetOneResponseDto } from '../../category/dtos'
+import { CategoryGetOneForAdminResponse, CategoryGetOneResponse } from '../../category/interfaces'
 import { newRandomUUID } from '../../../common/helpers'
 
 export class NewImageDto implements NewImage {
@@ -66,8 +66,8 @@ export class NewGetOneForAdminResponseDto implements NewGetOneForAdminResponse {
 	@ApiProperty({ type: AdminGetOneResponseDto })
 	admin: AdminGetOneResponse
 
-	@ApiProperty({ type: CategoryGetOneResponseDto })
-	category: CategoryGetOneResponse
+	@ApiProperty({ type: CategoryGetOneForAdminResponseDto })
+	category: CategoryGetOneForAdminResponse
 
 	@ApiProperty({ type: Number })
 	viewsCount: number

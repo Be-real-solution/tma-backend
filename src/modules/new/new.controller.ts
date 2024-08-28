@@ -14,10 +14,9 @@ import {
 	NewUpdateRequestDto,
 } from './dtos'
 import { NewGetAllForAdminResponse, NewGetAllResponse, NewGetOneForAdminResponse, NewGetOneResponse } from './interfaces'
-import { AuthGuard, MutationResDto, MutationResponseDto, PAGE_NUMBER, PAGE_SIZE, PAGINATION } from '../../common'
+import { AuthGuard, LanguageDto, MutationResDto, MutationResponseDto, PAGE_NUMBER, PAGE_SIZE, PAGINATION } from '../../common'
 import { CResponse, CustomUploadedFiles, MutationResponse } from '../../interfaces'
 import { FileFieldsInterceptor } from '@nestjs/platform-express'
-import { LanguageEnum } from '@prisma/client'
 
 @ApiTags('new')
 @Controller('new')
@@ -30,7 +29,7 @@ export class NewController {
 	@Get()
 	@ApiResponse({ type: NewGetAllResponseDto })
 	@ApiResponse({ type: NewGetOneResponseDto, isArray: true })
-	getAll(@Query() payload: NewGetAllRequestDto, @Headers('accept-language') lang: LanguageEnum): Promise<CResponse<NewGetAllResponse | NewGetOneResponse[]>> {
+	getAll(@Query() payload: NewGetAllRequestDto, @Headers() header: LanguageDto): Promise<CResponse<NewGetAllResponse | NewGetOneResponse[]>> {
 		return this.service.getAll(
 			{
 				...payload,
@@ -38,7 +37,7 @@ export class NewController {
 				pageSize: payload.pageSize ?? PAGE_SIZE,
 				pagination: [true, 'true'].includes(payload.pagination) ? PAGINATION : false,
 			},
-			lang,
+			header['accept-language'],
 		)
 	}
 
@@ -60,8 +59,8 @@ export class NewController {
 	@Get('carousel')
 	@ApiResponse({ type: NewGetAllResponseDto })
 	@ApiResponse({ type: NewGetOneResponseDto, isArray: true })
-	getAllForCarousel(@Headers('accept-language') lang: LanguageEnum): Promise<CResponse<NewGetAllResponse | NewGetOneResponse[]>> {
-		return this.service.getAll({ isTop: true, pagination: false }, lang)
+	getAllForCarousel(@Headers() header: LanguageDto): Promise<CResponse<NewGetAllResponse | NewGetOneResponse[]>> {
+		return this.service.getAll({ isTop: true, pagination: false }, header['accept-language'])
 	}
 
 	@ApiTags('admin-panel')
@@ -75,8 +74,8 @@ export class NewController {
 
 	@Get(':id')
 	@ApiResponse({ type: NewGetOneResponseDto })
-	getOneById(@Param() payload: NewGetOneByIdRequestDto, @Headers('accept-language') lang: LanguageEnum): Promise<CResponse<NewGetOneResponse>> {
-		return this.service.getOneById(payload, lang)
+	getOneById(@Param() payload: NewGetOneByIdRequestDto, @Headers() header: LanguageDto): Promise<CResponse<NewGetOneResponse>> {
+		return this.service.getOneById(payload, header['accept-language'])
 	}
 
 	@UseGuards(AuthGuard)
