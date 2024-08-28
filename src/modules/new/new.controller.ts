@@ -90,7 +90,7 @@ export class NewController {
 	)
 	@ApiResponse({ type: MutationResponseDto })
 	create(@Body() payload: NewCreateRequestDto, @UploadedFiles() files: CustomUploadedFiles): Promise<CResponse<MutationResponse>> {
-		if (!files || !files.image.length) {
+		if (!files || !files?.image?.length) {
 			throw new BadRequestException('main image must be provided')
 		}
 
@@ -117,7 +117,7 @@ export class NewController {
 	)
 	@ApiResponse({ type: MutationResDto })
 	update(@Param() param: NewGetOneByIdRequestDto, @Body() payload: NewUpdateRequestDto, @UploadedFiles() files: CustomUploadedFiles): Promise<CResponse<MutationResponse>> {
-		return this.service.update(param, { ...payload, image: files?.image.length ? files.image[0].filename || undefined : undefined, images: files.images })
+		return this.service.update(param, { ...payload, image: files?.image?.length ? files.image[0].filename || undefined : undefined, images: files?.images })
 	}
 
 	@UseGuards(AuthGuard)

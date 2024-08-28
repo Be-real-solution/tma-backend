@@ -82,10 +82,10 @@ export class BuildingController {
 	)
 	@ApiResponse({ type: MutationResDto })
 	create(@Body() payload: BuildingCreateRequestDto, @UploadedFiles() files: CustomUploadedFiles): Promise<CResponse<MutationResponse>> {
-		if (!files.image.length) {
+		if (!files.image?.length) {
 			throw new BadRequestException('image cannot be empty')
 		}
-		return this.service.create({ ...payload, image: files.image[0].filename, images: files.images })
+		return this.service.create({ ...payload, image: files?.image[0].filename, images: files?.images })
 	}
 
 	@UseGuards(AuthGuard)
@@ -104,7 +104,7 @@ export class BuildingController {
 		@Body() payload: BuildingUpdateRequestDto,
 		@UploadedFiles() files: CustomUploadedFiles,
 	): Promise<CResponse<MutationResponse>> {
-		return this.service.update(param, { ...payload, image: files?.image?.length ? files?.image[0].filename ?? undefined : undefined, images: files.images })
+		return this.service.update(param, { ...payload, image: files?.image?.length ? files?.image[0].filename ?? undefined : undefined, images: files?.images })
 	}
 
 	@UseGuards(AuthGuard)
