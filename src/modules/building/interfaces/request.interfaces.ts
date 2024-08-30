@@ -28,12 +28,12 @@ export declare interface BuildingGetOneRequest {
 export declare interface BuildingCreateRequest {
 	name: CreateInManyLangs
 	address: CreateInManyLangs
-	description: CreateInManyLangs
+	description?: UpdateInManyLangs
 	latitude: string
 	longitude: string
 	phoneNumber: string
-	workEndTime: string
-	workStartTime: string
+	workEndTime?: string
+	workStartTime?: string
 	image?: string
 	//=
 	images?: Array<Express.Multer.File>

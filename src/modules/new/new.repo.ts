@@ -50,7 +50,7 @@ export class NewRepo {
 				name: { contains: payload.name, mode: 'insensitive' },
 				description: { contains: payload.description, mode: 'insensitive' },
 				adminId: payload.adminId,
-				categoryId: payload.categoryId,
+				categories: { some: { id: { in: payload.categoryIds } } },
 				isTop: payload.isTop,
 				createdAt: { ...dateOptions },
 			},
@@ -59,7 +59,7 @@ export class NewRepo {
 				name: true,
 				description: true,
 				admin: { select: { id: true, fullName: true, username: true, type: true, createdAt: true } },
-				category: { select: { id: true, name: true, createdAt: true } },
+				categories: { select: { id: true, name: true, createdAt: true } },
 				viewsCount: true,
 				isTop: true,
 				createdAt: true,
@@ -77,7 +77,7 @@ export class NewRepo {
 					name: { contains: payload.name, mode: 'insensitive' },
 					description: { contains: payload.description, mode: 'insensitive' },
 					adminId: payload.adminId,
-					categoryId: payload.categoryId,
+					categories: { some: { id: { in: payload.categoryIds } } },
 					isTop: payload.isTop,
 					createdAt: { ...dateOptions },
 				},
@@ -101,7 +101,7 @@ export class NewRepo {
 				name: true,
 				description: true,
 				admin: { select: { id: true, fullName: true, username: true, type: true, createdAt: true } },
-				category: { select: { id: true, name: true, createdAt: true } },
+				categories: { select: { id: true, name: true, createdAt: true } },
 				viewsCount: true,
 				isTop: true,
 				createdAt: true,
@@ -120,7 +120,7 @@ export class NewRepo {
 				name: payload.name,
 				description: payload.description,
 				adminId: payload.adminId,
-				categoryId: payload.categoryId,
+				categories: { some: { id: { in: payload.categoryIds } } },
 				isTop: payload.isTop,
 			},
 			select: {
@@ -128,7 +128,7 @@ export class NewRepo {
 				name: true,
 				description: true,
 				admin: { select: { id: true, fullName: true, username: true, type: true, createdAt: true } },
-				category: { select: { id: true, name: true, createdAt: true } },
+				categories: { select: { id: true, name: true, createdAt: true } },
 				viewsCount: true,
 				isTop: true,
 				createdAt: true,
@@ -146,16 +146,16 @@ export class NewRepo {
 			throw new BadRequestException('admin not found')
 		}
 
-		const category = await this.prisma.category.findFirst({ where: { deletedAt: null, id: payload.categoryId } })
-		if (!category) {
-			throw new BadRequestException('category not found')
+		const categories = await this.prisma.category.findMany({ where: { deletedAt: null, id: { in: payload.categoryIds } }, select: { id: true } })
+		if (!categories.length) {
+			throw new BadRequestException('categories not found')
 		}
 
 		const neww = await this.prisma.new.create({
 			data: {
 				name: payload.name['en'] || Object.keys(payload.name)[0] || '',
 				description: payload.description['en'] || Object.keys(payload.description)[0] || '',
-				categoryId: payload.categoryId,
+				categories: { connect: categories },
 				adminId: payload.adminId,
 				isTop: payload.isTop,
 				mainImage: payload.image,
@@ -171,11 +171,16 @@ export class NewRepo {
 				throw new BadRequestException('admin not found')
 			}
 		}
-		if (payload.categoryId) {
-			const category = await this.prisma.category.findFirst({ where: { deletedAt: null, id: payload.categoryId } })
-			if (!category) {
-				throw new BadRequestException('category not found')
+		let categories
+		if (payload?.categoryIds?.length) {
+			categories = await this.prisma.category.findMany({ where: { deletedAt: null, id: { in: payload.categoryIds } }, select: { id: true } })
+			if (!categories.length) {
+				throw new BadRequestException('categories not found')
 			}
+		}
+		let discategories
+		if (payload?.categoryIdsToDelete?.length) {
+			discategories = await this.prisma.category.findMany({ where: { deletedAt: null, id: { in: payload.categoryIdsToDelete } }, select: { id: true } })
 		}
 
 		const neww = await this.prisma.new.update({
@@ -183,7 +188,7 @@ export class NewRepo {
 			data: {
 				name: payload.name?.en ?? undefined,
 				description: payload.description?.en ?? undefined,
-				categoryId: payload.categoryId,
+				categories: { connect: categories, disconnect: discategories },
 				adminId: payload.adminId,
 				viewsCount: payload.viewsCount,
 				isTop: payload.isTop,

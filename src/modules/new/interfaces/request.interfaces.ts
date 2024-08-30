@@ -3,7 +3,7 @@ import { CreateInManyLangs, PaginationRequest, UpdateInManyLangs } from '../../.
 export declare interface NewGetAllRequest extends PaginationRequest {
 	name?: string
 	description?: string
-	categoryId?: string
+	categoryIds?: string[]
 	adminId?: string
 	isTop?: boolean
 	startDate?: Date
@@ -19,7 +19,7 @@ export declare interface NewGetOneRequest {
 	name?: string
 	description?: string
 	adminId?: string
-	categoryId?: string
+	categoryIds?: string[]
 	viewsCount?: number
 	isTop?: boolean
 }
@@ -28,7 +28,7 @@ export declare interface NewCreateRequest {
 	name: CreateInManyLangs
 	description: CreateInManyLangs
 	adminId: string
-	categoryId: string
+	categoryIds: string[]
 	isTop?: boolean
 	//=
 	image?: string
@@ -40,7 +40,8 @@ export declare interface NewUpdateRequest {
 	description?: UpdateInManyLangs
 	adminId?: string
 	viewsCount?: number
-	categoryId?: string
+	categoryIds?: string[]
+	categoryIdsToDelete?: string[]
 	isTop?: boolean
 	//=
 	image?: string

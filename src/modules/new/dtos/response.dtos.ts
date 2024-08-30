@@ -29,8 +29,8 @@ export class NewGetOneResponseDto implements NewGetOneResponse {
 	@ApiProperty({ type: AdminGetOneResponseDto })
 	admin: AdminGetOneResponse
 
-	@ApiProperty({ type: CategoryGetOneResponseDto })
-	category: CategoryGetOneResponse
+	@ApiProperty({ type: CategoryGetOneResponseDto, isArray: true })
+	categories: CategoryGetOneResponse[]
 
 	@ApiProperty({ type: Number })
 	viewsCount: number
@@ -66,8 +66,8 @@ export class NewGetOneForAdminResponseDto implements NewGetOneForAdminResponse {
 	@ApiProperty({ type: AdminGetOneResponseDto })
 	admin: AdminGetOneResponse
 
-	@ApiProperty({ type: CategoryGetOneForAdminResponseDto })
-	category: CategoryGetOneForAdminResponse
+	@ApiProperty({ type: CategoryGetOneForAdminResponseDto, isArray: true })
+	categories: CategoryGetOneForAdminResponse[]
 
 	@ApiProperty({ type: Number })
 	viewsCount: number

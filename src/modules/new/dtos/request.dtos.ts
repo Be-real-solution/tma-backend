@@ -21,10 +21,11 @@ export class NewGetAllRequestDto extends PaginationRequestDto implements NewGetA
 	@IsOptional()
 	description?: string
 
-	@ApiPropertyOptional({ type: String })
-	@IsUUID('4')
+	@ApiPropertyOptional({ type: String, isArray: true })
+	@IsArray()
+	@IsUUID('4', { each: true })
 	@IsOptional()
-	categoryId?: string
+	categoryIds?: string[]
 
 	@ApiPropertyOptional({ type: Boolean })
 	@IsBooleanString()
@@ -75,10 +76,11 @@ export class NewGetOneRequestDto implements NewGetOneRequest {
 	@IsOptional()
 	description?: string
 
-	@ApiPropertyOptional({ type: String })
-	@IsUUID('4')
+	@ApiPropertyOptional({ type: String, isArray: true })
+	@IsArray()
+	@IsUUID('4', { each: true })
 	@IsOptional()
-	categoryId?: string
+	categoryIds?: string[]
 
 	@ApiPropertyOptional({ type: Boolean })
 	@IsBooleanString()
@@ -104,10 +106,11 @@ export class NewCreateRequestDto implements NewCreateRequest {
 	@Type(() => CreateInManyLangsDto)
 	description: CreateInManyLangs
 
-	@ApiProperty({ type: String })
-	@IsUUID('4')
+	@ApiProperty({ type: String, isArray: true })
+	@IsArray()
+	@IsUUID('4', { each: true })
 	@IsNotEmpty()
-	categoryId: string
+	categoryIds: string[]
 
 	@ApiPropertyOptional({ type: Boolean })
 	@IsBooleanString()
@@ -144,10 +147,17 @@ export class NewUpdateRequestDto implements NewUpdateRequest {
 	@IsOptional()
 	viewsCount?: number
 
-	@ApiPropertyOptional({ type: String })
-	@IsUUID('4')
+	@ApiPropertyOptional({ type: String, isArray: true })
+	@IsArray()
+	@IsUUID('4', { each: true })
 	@IsOptional()
-	categoryId?: string
+	categoryIds?: string[]
+
+	@ApiPropertyOptional({ type: String, isArray: true })
+	@IsArray()
+	@IsUUID('4', { each: true })
+	@IsOptional()
+	categoryIdsToDelete?: string[]
 
 	@ApiPropertyOptional({ type: String, isArray: true })
 	@ValidateNested({ each: true })
@@ -156,7 +166,7 @@ export class NewUpdateRequestDto implements NewUpdateRequest {
 	imagesToDelete?: string[]
 
 	@ApiPropertyOptional({ type: Boolean })
-	@IsBoolean()
+	@IsBooleanString()
 	@IsOptional()
 	isTop?: boolean
 

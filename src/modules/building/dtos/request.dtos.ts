@@ -58,11 +58,11 @@ export class BuildingCreateRequestDto implements BuildingCreateRequest {
 	@IsNotEmpty()
 	address: CreateInManyLangs
 
-	@ApiProperty({ type: CreateInManyLangsDto })
+	@ApiPropertyOptional({ type: UpdateInManyLangsDto })
 	@ValidateNested()
-	@Type(() => CreateInManyLangsDto)
-	@IsNotEmpty()
-	description: CreateInManyLangs
+	@Type(() => UpdateInManyLangsDto)
+	@IsOptional()
+	description?: UpdateInManyLangs = {}
 
 	@ApiProperty({ type: 'string', format: 'binary' })
 	image: any
@@ -75,15 +75,15 @@ export class BuildingCreateRequestDto implements BuildingCreateRequest {
 	@IsNotEmpty()
 	phoneNumber: string
 
-	@ApiProperty({ type: String })
+	@ApiPropertyOptional({ type: String })
 	@IsTimeString()
-	@IsNotEmpty()
-	workEndTime: string
+	@IsOptional()
+	workEndTime?: string
 
-	@ApiProperty({ type: String })
+	@ApiPropertyOptional({ type: String })
 	@IsTimeString()
-	@IsNotEmpty()
-	workStartTime: string
+	@IsOptional()
+	workStartTime?: string
 
 	@ApiProperty({ type: String })
 	@IsLatitude()

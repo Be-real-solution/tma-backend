@@ -157,9 +157,9 @@ export class BuildingRepo {
 	async create(payload: BuildingCreateRequest): Promise<MutationResponse> {
 		const building = await this.prisma.building.create({
 			data: {
-				name: payload.name['en'] || Object.keys(payload.name)[0] || '',
-				address: payload.address['en'] || Object.keys(payload.address)[0] || '',
-				description: payload.description['en'] || Object.keys(payload.description)[0] || '',
+				name: payload.name?.en || Object.keys(payload.name)[0] || '',
+				address: payload.address?.en || Object.keys(payload.address)[0] || '',
+				description: payload.description?.en || Object.keys(payload?.description)[0] || '',
 				phoneNumber: payload.phoneNumber,
 				workEndTime: payload.workEndTime,
 				workStartTime: payload.workStartTime,

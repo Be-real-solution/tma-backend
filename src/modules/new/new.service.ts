@@ -47,11 +47,18 @@ export class NewService {
 
 		const news = await this.repo.getAll({ ...payload, ids: tableIds, name: undefined, description: undefined })
 
+		const mappedTableIds: string[] = []
+		if (Array.isArray(news)) {
+			for (const n of news) {
+				mappedTableIds.push(n.id, ...n.categories.map((c) => c.id))
+			}
+		}
+
 		let mappedNews
 		const translations = await this.translationService.getAll({
 			language: lang,
 			tableFields: [TranslatedTableFields.newName, TranslatedTableFields.newDescription, TranslatedTableFields.categoryName],
-			tableIds: Array.isArray(news) ? [...news.map((n) => n.id), ...news.map((n) => n.category.id)] : [...news.data.map((n) => n.id), ...news.data.map((n) => n.category.id)],
+			tableIds: mappedTableIds,
 		})
 
 		const translatedObject = await TranslationArrayToObject(translations)
@@ -62,10 +69,10 @@ export class NewService {
 					...n,
 					name: translatedObject[`${n.id}=${TranslatedTableFields.newName}`] || n.name,
 					description: translatedObject[`${n.id}=${TranslatedTableFields.newDescription}`] || n.description,
-					category: {
-						...n.category,
-						name: translatedObject[`${n.category.id}=${TranslatedTableFields.categoryName}`] || n.category.name,
-					},
+					categories: n.categories.map((c) => ({
+						...c,
+						name: translatedObject[`${c.id}=${TranslatedTableFields.categoryName}`] || c.name,
+					})),
 				}
 			})
 
@@ -104,10 +111,17 @@ export class NewService {
 
 		const news = await this.repo.getAll({ ...payload, ids: tableIds, name: undefined, description: undefined })
 
+		const mappedTableIds: string[] = []
+		if (Array.isArray(news)) {
+			for (const n of news) {
+				mappedTableIds.push(n.id, ...n.categories.map((c) => c.id))
+			}
+		}
+
 		let mappedNews
 		const translations = await this.translationService.getAll({
 			tableFields: [TranslatedTableFields.newName, TranslatedTableFields.newDescription, TranslatedTableFields.categoryName],
-			tableIds: Array.isArray(news) ? [...news.map((n) => n.id), ...news.map((n) => n.category.id)] : [...news.data.map((n) => n.id), ...news.data.map((n) => n.category.id)],
+			tableIds: mappedTableIds,
 		})
 
 		const translatedObject = await TranslationArrayToObject2(translations)
@@ -118,10 +132,10 @@ export class NewService {
 					...n,
 					name: translatedObject[`${n.id}=${TranslatedTableFields.newName}`],
 					description: translatedObject[`${n.id}=${TranslatedTableFields.newDescription}`],
-					category: {
-						...n.category,
-						name: translatedObject[`${n.category.id}=${TranslatedTableFields.categoryName}`],
-					},
+					categories: n.categories.map((c) => ({
+						...c,
+						name: translatedObject[`${c.id}=${TranslatedTableFields.categoryName}`],
+					})),
 				}
 			})
 
@@ -132,10 +146,10 @@ export class NewService {
 					...n,
 					name: translatedObject[`${n.id}=${TranslatedTableFields.newName}`],
 					description: translatedObject[`${n.id}=${TranslatedTableFields.newDescription}`],
-					category: {
-						...n.category,
-						name: translatedObject[`${n.category.id}=${TranslatedTableFields.categoryName}`],
-					},
+					categories: n.categories.map((c) => ({
+						...c,
+						name: translatedObject[`${c.id}=${TranslatedTableFields.categoryName}`],
+					})),
 				}
 			})
 		}
@@ -158,7 +172,7 @@ export class NewService {
 		const translations = await this.translationService.getAll({
 			language: lang,
 			tableFields: [TranslatedTableFields.newName, TranslatedTableFields.newDescription, TranslatedTableFields.categoryName],
-			tableIds: [neww.id, neww.category.id],
+			tableIds: [neww.id, ...neww.categories.map((c) => c.id)],
 		})
 
 		const translatedObject = await TranslationArrayToObject(translations)
@@ -169,10 +183,10 @@ export class NewService {
 				...neww,
 				name: translatedObject[`${neww.id}=${TranslatedTableFields.newName}`] || neww.name,
 				description: translatedObject[`${neww.id}=${TranslatedTableFields.newDescription}`] || neww.description,
-				category: {
-					...neww.category,
-					name: translatedObject[`${neww.category.id}=${TranslatedTableFields.categoryName}`] || neww.category.name,
-				},
+				categories: neww.categories.map((c) => ({
+					...c,
+					name: translatedObject[`${c.id}=${TranslatedTableFields.categoryName}`] || c.name,
+				})),
 			},
 			status: 200,
 		}
@@ -186,7 +200,7 @@ export class NewService {
 
 		const translations = await this.translationService.getAll({
 			tableFields: [TranslatedTableFields.newName, TranslatedTableFields.newDescription, TranslatedTableFields.categoryName],
-			tableIds: [neww.id, neww.category.id],
+			tableIds: [neww.id, ...neww.categories.map((c) => c.id)],
 		})
 
 		const translatedObject = await TranslationArrayToObject2(translations)
@@ -197,10 +211,10 @@ export class NewService {
 				...neww,
 				name: translatedObject[`${neww.id}=${TranslatedTableFields.newName}`],
 				description: translatedObject[`${neww.id}=${TranslatedTableFields.newDescription}`],
-				category: {
-					...neww.category,
-					name: translatedObject[`${neww.category.id}=${TranslatedTableFields.categoryName}`],
-				},
+				categories: neww.categories.map((c) => ({
+					...c,
+					name: translatedObject[`${c.id}=${TranslatedTableFields.categoryName}`],
+				})),
 			},
 		}
 	}

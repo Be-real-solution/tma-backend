@@ -15,7 +15,7 @@ export declare interface NewGetOneResponse {
 	name: string
 	description: string
 	admin: AdminGetOneResponse
-	category: CategoryGetOneResponse
+	categories: CategoryGetOneResponse[]
 	viewsCount: number
 	isTop: boolean
 	mainImage: string
@@ -30,7 +30,7 @@ export declare interface NewGetOneForAdminResponse {
 	name: CreateInManyLangs
 	description: CreateInManyLangs
 	admin: AdminGetOneResponse
-	category: CategoryGetOneForAdminResponse
+	categories: CategoryGetOneForAdminResponse[]
 	viewsCount: number
 	isTop: boolean
 	mainImage: string

@@ -215,9 +215,7 @@ export class BuildingService {
 	}
 
 	async update(param: BuildingGetOneByIdRequest, payload: BuildingUpdateRequest): Promise<CResponse<MutationResponse>> {
-		console.log(payload)
 		const ca = await this.getOneByIdForAdmin(param)
-		console.log('can', ca)
 		if (!ca) {
 			throw new BadRequestException('building not found')
 		}
