@@ -94,7 +94,7 @@ export class NewController {
 			throw new BadRequestException('main image must be provided')
 		}
 
-		return this.service.create({ ...payload, image: files?.image[0].filename, images: files.images })
+		return this.service.create({ ...payload, isTop: [true, 'true'].includes(payload.isTop) ? true : false, image: files?.image[0].filename, images: files.images })
 	}
 
 	@UseGuards(AuthGuard)
@@ -117,7 +117,12 @@ export class NewController {
 	)
 	@ApiResponse({ type: MutationResDto })
 	update(@Param() param: NewGetOneByIdRequestDto, @Body() payload: NewUpdateRequestDto, @UploadedFiles() files: CustomUploadedFiles): Promise<CResponse<MutationResponse>> {
-		return this.service.update(param, { ...payload, image: files?.image?.length ? files.image[0].filename || undefined : undefined, images: files?.images })
+		return this.service.update(param, {
+			...payload,
+			isTop: [true, 'true'].includes(payload.isTop) ? true : [false, 'false'].includes(payload.isTop) ? false : undefined,
+			image: files?.image?.length ? files.image[0].filename || undefined : undefined,
+			images: files?.images,
+		})
 	}
 
 	@UseGuards(AuthGuard)
