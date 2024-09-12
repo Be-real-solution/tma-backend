@@ -83,6 +83,9 @@ export class NewGetOneRequestDto implements NewGetOneRequest {
 	@IsArray()
 	@IsUUID('4', { each: true })
 	@IsOptional()
+	@Transform((c) => {
+		return c?.value ? (Array.isArray(c.value) ? c.value : [c.value]) : undefined
+	})
 	categoryIds?: string[]
 
 	@ApiPropertyOptional({ type: Boolean })
@@ -113,6 +116,9 @@ export class NewCreateRequestDto implements NewCreateRequest {
 	@IsArray()
 	@IsUUID('4', { each: true })
 	@IsNotEmpty()
+	@Transform((c) => {
+		return c?.value ? (Array.isArray(c.value) ? c.value : [c.value]) : undefined
+	})
 	categoryIds: string[]
 
 	@ApiPropertyOptional({ type: Boolean })
@@ -154,18 +160,27 @@ export class NewUpdateRequestDto implements NewUpdateRequest {
 	@IsArray()
 	@IsUUID('4', { each: true })
 	@IsOptional()
+	@Transform((c) => {
+		return c?.value ? (Array.isArray(c.value) ? c.value : [c.value]) : undefined
+	})
 	categoryIds?: string[]
 
 	@ApiPropertyOptional({ type: String, isArray: true })
 	@IsArray()
 	@IsUUID('4', { each: true })
 	@IsOptional()
+	@Transform((c) => {
+		return c?.value ? (Array.isArray(c.value) ? c.value : [c.value]) : undefined
+	})
 	categoryIdsToDelete?: string[]
 
 	@ApiPropertyOptional({ type: String, isArray: true })
 	@ValidateNested({ each: true })
 	@IsUUID('4')
 	@IsOptional()
+	@Transform((c) => {
+		return c?.value ? (Array.isArray(c.value) ? c.value : [c.value]) : undefined
+	})
 	imagesToDelete?: string[]
 
 	@ApiPropertyOptional({ type: Boolean })
@@ -185,6 +200,9 @@ export class NewUpdateManyCarouselDto implements NewUpdateManyCarousel {
 	@IsArray()
 	@IsUUID('4', { each: true })
 	@IsNotEmpty()
+	@Transform((c) => {
+		return c?.value ? (Array.isArray(c.value) ? c.value : [c.value]) : undefined
+	})
 	ids: string[]
 
 	@ApiProperty({ type: Boolean })
