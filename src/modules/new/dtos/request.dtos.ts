@@ -26,7 +26,7 @@ export class NewGetAllRequestDto extends PaginationRequestDto implements NewGetA
 	@IsUUID('4', { each: true })
 	@IsOptional()
 	@Transform((c) => {
-		return Array.isArray(c.value) ? c.value : [c.value]
+		return c?.value ? (Array.isArray(c.value) ? c.value : [c.value]) : []
 	})
 	categoryIds?: string[]
 
