@@ -37,7 +37,7 @@ export class NewController {
 				pageSize: payload.pageSize ?? PAGE_SIZE,
 				pagination: [true, 'true'].includes(payload.pagination) ? PAGINATION : false,
 			},
-			header['accept-language'],
+			header['accept-language'] ?? 'uz',
 		)
 	}
 
@@ -60,7 +60,7 @@ export class NewController {
 	@ApiResponse({ type: NewGetAllResponseDto })
 	@ApiResponse({ type: NewGetOneResponseDto, isArray: true })
 	getAllForCarousel(@Headers() header: LanguageDto): Promise<CResponse<NewGetAllResponse | NewGetOneResponse[]>> {
-		return this.service.getAll({ isTop: true, pagination: false }, header['accept-language'])
+		return this.service.getAll({ isTop: true, pagination: false }, header['accept-language'] ?? 'uz')
 	}
 
 	@ApiTags('admin-panel')
@@ -75,7 +75,7 @@ export class NewController {
 	@Get(':id')
 	@ApiResponse({ type: NewGetOneResponseDto })
 	getOneById(@Param() payload: NewGetOneByIdRequestDto, @Headers() header: LanguageDto): Promise<CResponse<NewGetOneResponse>> {
-		return this.service.getOneById(payload, header['accept-language'])
+		return this.service.getOneById(payload, header['accept-language'] ?? 'uz')
 	}
 
 	@UseGuards(AuthGuard)

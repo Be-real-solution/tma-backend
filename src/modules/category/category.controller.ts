@@ -26,7 +26,7 @@ export class CategoryController {
 				pageSize: payload.pageSize ?? PAGE_SIZE,
 				pagination: [true, 'true'].includes(payload.pagination) ? PAGINATION : false,
 			},
-			header['accept-language'],
+			header['accept-language'] ?? 'uz',
 		)
 	}
 
@@ -41,7 +41,7 @@ export class CategoryController {
 				pageSize: payload.pageSize ?? PAGE_SIZE,
 				pagination: [true, 'true'].includes(payload.pagination) ? PAGINATION : false,
 			},
-			header['accept-language'],
+			header['accept-language'] ?? 'uz',
 		)
 	}
 
@@ -72,7 +72,7 @@ export class CategoryController {
 	@Get(':id')
 	@ApiResponse({ type: CategoryGetOneResDto })
 	getOneById(@Param() payload: CategoryGetOneByIdRequestDto, @Headers() header: LanguageDto): Promise<CResponse<CategoryGetOneResponse>> {
-		return this.service.getOneById(payload, header['accept-language'])
+		return this.service.getOneById(payload, header['accept-language'] ?? 'uz')
 	}
 
 	@UseGuards(AuthGuard)

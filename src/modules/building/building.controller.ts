@@ -36,7 +36,7 @@ export class BuildingController {
 				pageSize: payload.pageSize ?? PAGE_SIZE,
 				pagination: [true, 'true'].includes(payload.pagination) ? PAGINATION : false,
 			},
-			header['accept-language'],
+			header['accept-language'] ?? 'uz',
 		)
 	}
 
@@ -67,7 +67,7 @@ export class BuildingController {
 	@Get(':id')
 	@ApiResponse({ type: BuildingGetOneResDto })
 	getOneById(@Param() payload: BuildingGetOneByIdRequestDto, @Headers() header: LanguageDto): Promise<CResponse<BuildingGetOneResponse>> {
-		return this.service.getOneById(payload, header['accept-language'])
+		return this.service.getOneById(payload, header['accept-language'] ?? 'uz')
 	}
 
 	@UseGuards(AuthGuard)
