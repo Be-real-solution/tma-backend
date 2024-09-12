@@ -3,7 +3,7 @@ import { CreateInManyLangsDto, PaginationRequestDto, UpdateInManyLangsDto } from
 import { CreateInManyLangs, UpdateInManyLangs } from '../../../interfaces'
 import { NewCreateRequest, NewDeleteRequest, NewGetAllRequest, NewGetOneByIdRequest, NewGetOneRequest, NewUpdateManyCarousel, NewUpdateRequest } from '../interfaces'
 import { IsArray, IsBoolean, IsBooleanString, IsDateString, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID, ValidateNested } from 'class-validator'
-import { Type } from 'class-transformer'
+import { Transform, Type } from 'class-transformer'
 
 export class NewGetAllRequestDto extends PaginationRequestDto implements NewGetAllRequest {
 	@ApiPropertyOptional({ type: String })
@@ -25,6 +25,9 @@ export class NewGetAllRequestDto extends PaginationRequestDto implements NewGetA
 	@IsArray()
 	@IsUUID('4', { each: true })
 	@IsOptional()
+	@Transform((c) => {
+		return Array.isArray(c.value) ? c.value : [c.value]
+	})
 	categoryIds?: string[]
 
 	@ApiPropertyOptional({ type: Boolean })
